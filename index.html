@@ -1,0 +1,2873 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reaction Kinetics: The Speed Limit of Chemistry — Interactive Story Notebook</title>
+  <!-- Load Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Load Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    /* Subtle Digital Science Notebook Grid Texture */
+    body {
+      background-color: #f8fafc;
+      background-image:
+        linear-gradient(to right, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(148, 163, 184, 0.08) 1px, transparent 1px);
+      background-size: 28px 28px;
+      color: #0f172a;
+      overflow-x: hidden;
+    }
+
+    /* Custom Range Sliders */
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 8px;
+      border-radius: 9999px;
+      background: #e2e8f0;
+      outline: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      background: currentColor;
+      cursor: pointer;
+      border: 3px solid #ffffff;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+      transition: transform 0.15s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+
+    /* Drag & Drop Visual States */
+    .dnd-chip {
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      cursor: grab;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+    }
+    .dnd-chip:active {
+      cursor: grabbing;
+    }
+    .dnd-chip.selected-chip {
+      ring: 3px;
+      transform: translateY(-2px) scale(1.04);
+      box-shadow: 0 8px 18px -4px rgba(79, 70, 229, 0.35);
+    }
+    .dnd-zone {
+      transition: all 0.18s ease;
+    }
+    .dnd-zone.zone-hover {
+      transform: scale(1.05);
+      border-style: solid !important;
+      background-color: rgba(99, 102, 241, 0.12) !important;
+    }
+
+    /* Floating Pointer Drag Ghost */
+    #drag-ghost {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%) scale(1.08);
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.25);
+      opacity: 0.95;
+    }
+
+    /* Responsive Canvas Container */
+    .canvas-wrap {
+      position: relative;
+      width: 100%;
+    }
+    .canvas-wrap canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-indigo-100 selection:text-indigo-900">
+
+  <!-- ===================================================================== -->
+  <!-- STICKY TOP NAVIGATION & LIVE MASTERY PROGRESS HEADER                  -->
+  <!-- ===================================================================== -->
+  <header class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200/90 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+        <!-- Brand & Title -->
+        <div class="flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center font-mono font-bold text-lg shadow-sm shrink-0">
+              k(T)
+            </div>
+            <div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 block">Interactive Chemistry Studio</span>
+              <h1 class="text-sm sm:text-base font-extrabold text-slate-900 leading-tight">
+                Reaction Kinetics: The Speed Limit of Chemistry
+              </h1>
+            </div>
+          </div>
+
+          <!-- Sound Effects Toggle (Mobile & Desktop) -->
+          <button id="sound-toggle" type="button" title="Toggle Studio Sound Effects"
+            class="lg:hidden px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 flex items-center gap-1.5">
+            <span id="sound-icon-m">🔊</span>
+            <span>SFX</span>
+          </button>
+        </div>
+
+        <!-- 5-Step Story Stepper -->
+        <nav aria-label="Story Acts Navigation" class="flex items-center gap-1.5 overflow-x-auto pb-1 lg:pb-0 no-scrollbar">
+          <a href="#act-1" data-step="act-1"
+            class="step-pill shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 bg-indigo-50 text-indigo-700 border-indigo-200">
+            <span class="w-4 h-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center">I</span>
+            <span>Prologue &amp; Act I</span>
+            <span class="step-check hidden text-emerald-600">✓</span>
+          </a>
+          <a href="#act-2" data-step="act-2"
+            class="step-pill shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 bg-white text-slate-600 border-slate-200 hover:border-emerald-300">
+            <span class="w-4 h-4 rounded-full bg-emerald-600 text-white text-[10px] flex items-center justify-center">II</span>
+            <span>Act II: Rate Laws</span>
+            <span class="step-check hidden text-emerald-600">✓</span>
+          </a>
+          <a href="#act-3" data-step="act-3"
+            class="step-pill shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 bg-white text-slate-600 border-slate-200 hover:border-amber-300">
+            <span class="w-4 h-4 rounded-full bg-amber-500 text-white text-[10px] flex items-center justify-center">III</span>
+            <span>Act III: Collisions</span>
+            <span class="step-check hidden text-emerald-600">✓</span>
+          </a>
+          <a href="#act-4" data-step="act-4"
+            class="step-pill shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 bg-white text-slate-600 border-slate-200 hover:border-rose-300">
+            <span class="w-4 h-4 rounded-full bg-rose-600 text-white text-[10px] flex items-center justify-center">IV</span>
+            <span>Act IV: Controls</span>
+            <span class="step-check hidden text-emerald-600">✓</span>
+          </a>
+          <a href="#epilogue" data-step="epilogue"
+            class="step-pill shrink-0 px-3 py-1.5 rounded-xl text-xs font-bold border transition-all flex items-center gap-1.5 bg-white text-slate-600 border-slate-200 hover:border-slate-400">
+            <span class="w-4 h-4 rounded-full bg-slate-800 text-white text-[10px] flex items-center justify-center">★</span>
+            <span>Epilogue Check</span>
+            <span class="step-check hidden text-emerald-600">✓</span>
+          </a>
+        </nav>
+
+        <!-- Live Mastery Progress Bar -->
+        <div class="flex items-center gap-3 shrink-0">
+          <div class="flex-1 lg:w-44">
+            <div class="flex justify-between text-[11px] font-bold text-slate-600 mb-1">
+              <span>Mastery Progress</span>
+              <span id="mastery-percent" class="font-mono text-indigo-600">0%</span>
+            </div>
+            <div class="w-full h-2.5 bg-slate-200 rounded-full overflow-hidden">
+              <div id="mastery-bar" class="h-full bg-gradient-to-r from-indigo-500 via-emerald-500 to-amber-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+          </div>
+          <button id="sound-toggle-desktop" type="button" title="Toggle Studio Sound Effects"
+            class="hidden lg:flex px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-xs font-semibold text-slate-700 items-center gap-1.5">
+            <span id="sound-icon-d">🔊</span>
+            <span>SFX</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Toast Notification Banner (Replaces alert()) -->
+  <div id="toast-banner" class="fixed bottom-5 right-5 z-50 max-w-sm transform translate-y-24 opacity-0 pointer-events-none transition-all duration-300">
+    <div class="bg-slate-900 text-white px-4 py-3 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-3">
+      <span id="toast-emoji" class="text-xl">🎉</span>
+      <div>
+        <p id="toast-title" class="text-xs font-extrabold uppercase tracking-wider text-indigo-300">Milestone Unlocked</p>
+        <p id="toast-msg" class="text-sm font-medium text-slate-100">Great job!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- MAIN CONTENT CONTAINER                                                -->
+  <!-- ===================================================================== -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+    <!-- =================================================================== -->
+    <!-- PROLOGUE & ACT I: THE SPEEDOMETER & TRAFFIC CONTROLLER (INDIGO)     -->
+    <!-- =================================================================== -->
+    <section id="act-1" class="scroll-mt-28 space-y-8">
+      <!-- Prologue Hero Card -->
+      <div class="bg-white rounded-3xl border border-indigo-100 shadow-sm overflow-hidden">
+        <div class="bg-gradient-to-r from-indigo-600 via-indigo-700 to-blue-700 px-6 sm:px-10 py-8 text-white">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/15 text-indigo-100 text-xs font-bold uppercase tracking-wider mb-3">
+            <span>Prologue</span>
+            <span>•</span>
+            <span>The Detective Story Begins</span>
+          </div>
+          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-3">
+            Why Does Chemistry Have a Speed Limit?
+          </h2>
+          <p class="text-indigo-100 text-sm sm:text-base max-w-3xl leading-relaxed">
+            Thermodynamics tells us <em>whether</em> a reaction can happen—but <strong>Reaction Kinetics</strong> reveals <em>how fast</em> it happens and how we can control that speed. Compare these three real chemical transformations:
+          </p>
+
+          <!-- 3-Speed Spectrum Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+            <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-bold uppercase tracking-wider text-amber-300">Explosive Speed</span>
+                <span class="font-mono text-xs bg-black/25 px-2 py-0.5 rounded-lg">~10⁻⁶ s</span>
+              </div>
+              <h3 class="font-bold text-base">Dynamite Detonation</h3>
+              <p class="text-xs text-indigo-100 mt-1">Rapid gas expansion shatters rock in microseconds.</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-bold uppercase tracking-wider text-emerald-300">Human Timescale</span>
+                <span class="font-mono text-xs bg-black/25 px-2 py-0.5 rounded-lg">~10⁷ s</span>
+              </div>
+              <h3 class="font-bold text-base">Iron Gate Rusting</h3>
+              <p class="text-xs text-indigo-100 mt-1">Oxidation of iron takes months or years of exposure to moisture.</p>
+            </div>
+            <div class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-4">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-xs font-bold uppercase tracking-wider text-sky-300">Geological Speed</span>
+                <span class="font-mono text-xs bg-black/25 px-2 py-0.5 rounded-lg">~10¹³ s</span>
+              </div>
+              <h3 class="font-bold text-base">Diamond → Graphite</h3>
+              <p class="text-xs text-indigo-100 mt-1">Thermodynamically favorable, yet kinetically frozen for millions of years!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Act I Narrative, Analogies & Real-World Hook -->
+        <div class="p-6 sm:p-10 space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-4">
+            <div>
+              <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-600">Act I • Syllabus 1.1 Reaction Rate</span>
+              <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">The Speedometer &amp; The Traffic Controller</h3>
+            </div>
+            <span class="px-3 py-1 rounded-xl bg-indigo-50 text-indigo-700 font-mono text-xs font-bold border border-indigo-200">
+              Units: mol dm⁻³ s⁻¹ (M s⁻¹)
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <!-- Analogy 1 -->
+            <div class="rounded-2xl bg-indigo-50/70 border border-indigo-100 p-5">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-indigo-700 mb-1">🚗 Analogy 1: The Highway Road Trip</div>
+              <h4 class="font-bold text-slate-900 mb-2">Average vs. Instantaneous vs. Initial Rate</h4>
+              <p class="text-sm text-slate-700 leading-relaxed">
+                Driving 350 km in 4 hours gives an <strong>average speed</strong> of 87.5 km/h. Glancing at your dashboard speedometer the exact second you pass a speed camera gives your <strong>instantaneous speed</strong> (the tangent slope). Your launch speed the instant the light turns green (<span class="font-mono">t = 0</span>) is your <strong>initial rate</strong>.
+              </p>
+            </div>
+
+            <!-- Analogy 2 -->
+            <div class="rounded-2xl bg-blue-50/70 border border-blue-100 p-5">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-blue-700 mb-1">🚲 Analogy 2: Bicycle Assembly Line</div>
+              <h4 class="font-bold text-slate-900 mb-2">Stoichiometry &amp; Differential Rate</h4>
+              <p class="text-sm text-slate-700 leading-relaxed">
+                If <span class="font-mono font-semibold">1 Frame + 2 Wheels → 1 Bicycle</span>, wheels disappear <em>twice as fast</em> as frames! To report one single factory rate, we divide each species' rate by its stoichiometric coefficient:
+                <span class="block font-mono text-xs bg-white p-2 rounded-xl border border-blue-200 mt-2 text-blue-900">
+                  Rate = -(1/a)d[A]/dt = +(1/c)d[C]/dt
+                </span>
+              </p>
+            </div>
+
+            <!-- Real-World Hook -->
+            <div class="rounded-2xl bg-slate-900 text-white p-5">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-amber-400 mb-1">💥 Real-World Engineering Hook</div>
+              <h4 class="font-bold text-white mb-2">Automotive Airbags (30 ms)</h4>
+              <p class="text-sm text-slate-300 leading-relaxed">
+                Engineers calibrate <span class="font-mono text-amber-300">2NaN₃(s) → 2Na(s) + 3N₂(g)</span> so nitrogen inflates the bag in ~0.030 s. Notice <span class="font-mono">N₂</span> forms 1.5× faster than <span class="font-mono">NaN₃</span> decomposes!
+              </p>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE SIMULATION 1: CONCENTRATION-TIME & TANGENT SPEEDOMETER -->
+          <div class="rounded-2xl border-2 border-indigo-200 bg-slate-50/70 p-5 sm:p-6 space-y-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-indigo-600">
+                  <span>🔬 Interactive Lab 1.1</span>
+                  <span id="badge-act1_sim" class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">Scrub Time to Explore</span>
+                </div>
+                <h4 class="text-lg font-extrabold text-slate-900">Concentration–Time &amp; Tangent Speedometer</h4>
+              </div>
+
+              <!-- Reaction Selector Tabs -->
+              <div class="flex flex-wrap gap-2" id="sim1-rxn-tabs">
+                <button type="button" data-rxn="AB" class="sim1-tab px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-indigo-600 text-white shadow-sm">
+                  A → B
+                </button>
+                <button type="button" data-rxn="HI" class="sim1-tab px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-white text-slate-700 border border-slate-200 hover:border-indigo-300">
+                  2HI → H₂ + I₂
+                </button>
+                <button type="button" data-rxn="NH3" class="sim1-tab px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-white text-slate-700 border border-slate-200 hover:border-indigo-300">
+                  N₂ + 3H₂ → 2NH₃
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+              <!-- Canvas Graph -->
+              <div class="lg:col-span-8 bg-white rounded-2xl border border-slate-200 p-3 shadow-inner">
+                <div class="canvas-wrap h-64 sm:h-72">
+                  <canvas id="canvas-act1"></canvas>
+                </div>
+              </div>
+
+              <!-- Controls & Live Telemetry -->
+              <div class="lg:col-span-4 space-y-4">
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-3">
+                  <div class="flex justify-between items-center">
+                    <label for="sim1-time" class="text-xs font-bold uppercase tracking-wider text-slate-600">Time Scrubber (t)</label>
+                    <span id="sim1-time-val" class="font-mono text-sm font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-lg">20.0 s</span>
+                  </div>
+                  <input id="sim1-time" type="range" min="0" max="100" step="0.5" value="20" class="w-full text-indigo-600" />
+                  <div class="flex gap-2">
+                    <button id="sim1-play" type="button" class="flex-1 py-2 px-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold transition">
+                      ▶ Play Reaction
+                    </button>
+                    <button id="sim1-initial" type="button" class="py-2 px-3 rounded-xl bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold transition">
+                      Jump t = 0 (Initial)
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Live Rate Telemetry -->
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-2.5">
+                  <div class="flex justify-between items-center text-xs">
+                    <span class="text-slate-500 font-semibold">Initial Rate (at t = 0 s):</span>
+                    <span id="sim1-init-rate" class="font-mono font-bold text-slate-800">0.0300 M/s</span>
+                  </div>
+                  <div class="flex justify-between items-center text-xs border-t border-slate-100 pt-2">
+                    <span class="text-slate-500 font-semibold">Instantaneous Overall Rate:</span>
+                    <span id="sim1-inst-rate" class="font-mono font-extrabold text-indigo-600 text-sm">0.0165 M/s</span>
+                  </div>
+                  <div id="sim1-species-rates" class="pt-2 border-t border-slate-100 space-y-1.5 text-xs font-mono">
+                    <!-- Populated dynamically by JS -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DRAG & DROP ACTIVITY 1: BUILD THE DIFFERENTIAL RATE EQUATION -->
+          <div class="rounded-2xl border-2 border-indigo-200 bg-white p-5 sm:p-6 space-y-5 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-indigo-600">
+                  <span>🧩 Interactive Checkpoint 1.2 (Drag &amp; Drop or Tap)</span>
+                  <span id="badge-act1_dnd" class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">Incomplete</span>
+                </div>
+                <h4 class="text-lg font-extrabold text-slate-900">Build the Differential Rate Equation for Ammonia Synthesis</h4>
+                <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
+                  Reaction: <span class="font-mono font-bold text-indigo-700">N₂(g) + 3H₂(g) → 2NH₃(g)</span>. Drag (or tap) the correct signs and coefficients into each slot.
+                </p>
+              </div>
+              <button type="button" onclick="resetDndGroup('act1')" class="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-600">
+                ↺ Reset Slots
+              </button>
+            </div>
+
+            <!-- Chip Bank -->
+            <div class="bg-slate-50 rounded-2xl p-3.5 border border-slate-200">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-2">Draggable Tile Bank (Tap or Drag onto Slots Below):</span>
+              <div id="bank-act1" class="flex flex-wrap gap-2">
+                <button type="button" class="dnd-chip px-3.5 py-2 rounded-xl bg-white border-2 border-indigo-300 font-mono font-extrabold text-sm text-indigo-800 shadow-sm" data-group="act1" data-val="-">−</button>
+                <button type="button" class="dnd-chip px-3.5 py-2 rounded-xl bg-white border-2 border-indigo-300 font-mono font-extrabold text-sm text-indigo-800 shadow-sm" data-group="act1" data-val="-">−</button>
+                <button type="button" class="dnd-chip px-3.5 py-2 rounded-xl bg-white border-2 border-emerald-300 font-mono font-extrabold text-sm text-emerald-800 shadow-sm" data-group="act1" data-val="+">+</button>
+                <button type="button" class="dnd-chip px-3.5 py-2 rounded-xl bg-white border-2 border-slate-300 font-mono font-extrabold text-sm text-slate-800 shadow-sm" data-group="act1" data-val="1">1</button>
+                <button type="button" class="dnd-chip px-3.5 py-2 rounded-xl bg-white border-2 border-slate-300 font-mono font-extrabold text-sm text-slate-800 shadow-sm" data-group="act1" data-val="1/3">1/3</button>
+                <button type="button" class="dnd-chip px-3.5 py-2 rounded-xl bg-white border-2 border-slate-300 font-mono font-extrabold text-sm text-slate-800 shadow-sm" data-group="act1" data-val="1/2">1/2</button>
+                <button type="button" class="dnd-chip px-3.5 py-2 rounded-xl bg-white border-2 border-slate-300 font-mono font-extrabold text-sm text-slate-800 shadow-sm" data-group="act1" data-val="3">3</button>
+                <button type="button" class="dnd-chip px-3.5 py-2 rounded-xl bg-white border-2 border-slate-300 font-mono font-extrabold text-sm text-slate-800 shadow-sm" data-group="act1" data-val="2">2</button>
+              </div>
+            </div>
+
+            <!-- Equation Drop Zones -->
+            <div class="overflow-x-auto pb-2">
+              <div class="min-w-[600px] flex items-center justify-center gap-2 sm:gap-3 bg-indigo-50/50 border border-indigo-100 rounded-2xl p-4 font-mono text-sm sm:text-base">
+                <span class="font-extrabold text-slate-900">Rate =</span>
+
+                <!-- N2 Term -->
+                <div class="flex items-center gap-1 bg-white px-2.5 py-2 rounded-xl border border-slate-200 shadow-sm">
+                  <div class="dnd-zone w-10 h-10 rounded-lg border-2 border-dashed border-indigo-300 flex items-center justify-center text-xs font-bold text-slate-400" data-group="act1" data-slot="s1" data-answer="-">sign</div>
+                  <div class="dnd-zone w-12 h-10 rounded-lg border-2 border-dashed border-indigo-300 flex items-center justify-center text-xs font-bold text-slate-400" data-group="act1" data-slot="c1" data-answer="1">coeff</div>
+                  <span class="font-bold text-slate-800 ml-1">d[N₂]/dt</span>
+                </div>
+
+                <span class="font-extrabold text-slate-500">=</span>
+
+                <!-- H2 Term -->
+                <div class="flex items-center gap-1 bg-white px-2.5 py-2 rounded-xl border border-slate-200 shadow-sm">
+                  <div class="dnd-zone w-10 h-10 rounded-lg border-2 border-dashed border-indigo-300 flex items-center justify-center text-xs font-bold text-slate-400" data-group="act1" data-slot="s2" data-answer="-">sign</div>
+                  <div class="dnd-zone w-12 h-10 rounded-lg border-2 border-dashed border-indigo-300 flex items-center justify-center text-xs font-bold text-slate-400" data-group="act1" data-slot="c2" data-answer="1/3">coeff</div>
+                  <span class="font-bold text-slate-800 ml-1">d[H₂]/dt</span>
+                </div>
+
+                <span class="font-extrabold text-slate-500">=</span>
+
+                <!-- NH3 Term -->
+                <div class="flex items-center gap-1 bg-white px-2.5 py-2 rounded-xl border border-slate-200 shadow-sm">
+                  <div class="dnd-zone w-10 h-10 rounded-lg border-2 border-dashed border-emerald-300 flex items-center justify-center text-xs font-bold text-slate-400" data-group="act1" data-slot="s3" data-answer="+">sign</div>
+                  <div class="dnd-zone w-12 h-10 rounded-lg border-2 border-dashed border-emerald-300 flex items-center justify-center text-xs font-bold text-slate-400" data-group="act1" data-slot="c3" data-answer="1/2">coeff</div>
+                  <span class="font-bold text-slate-800 ml-1">d[NH₃]/dt</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <button type="button" onclick="verifyAct1Dnd()" class="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition">
+                Verify Differential Equation
+              </button>
+              <p id="act1-dnd-feedback" class="text-xs sm:text-sm font-semibold text-slate-600"></p>
+            </div>
+
+            <!-- Worked Numerical Mini-Challenge (Revealed or always accessible) -->
+            <div id="act1-worked-box" class="rounded-2xl bg-indigo-950 text-indigo-50 p-4 sm:p-5 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-extrabold uppercase tracking-wider text-indigo-300">Worked Example Application</span>
+                <span class="text-xs font-mono text-indigo-300">Haber Process</span>
+              </div>
+              <p class="text-xs sm:text-sm text-indigo-100">
+                Suppose hydrogen is consumed at <span class="font-mono font-bold text-white">-d[H₂]/dt = 0.045 M s⁻¹</span>. Using your equation above, what is the rate of formation of <span class="font-mono font-bold text-emerald-300">+d[NH₃]/dt</span>?
+              </p>
+              <div class="flex flex-wrap items-center gap-2">
+                <input id="act1-num-input" type="number" step="0.001" placeholder="e.g. 0.030"
+                  class="px-3 py-2 rounded-xl bg-white/10 border border-indigo-400/40 text-white font-mono text-sm w-36 focus:outline-none focus:border-emerald-400" />
+                <span class="font-mono text-xs text-indigo-200">M s⁻¹</span>
+                <button type="button" onclick="checkAct1Numeric()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-extrabold transition">
+                  Check Answer
+                </button>
+                <span id="act1-num-feedback" class="text-xs font-bold"></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- ACT II: DECODING THE SECRET RECIPE (EMERALD THEME)                  -->
+    <!-- =================================================================== -->
+    <section id="act-2" class="scroll-mt-28 space-y-8">
+      <div class="bg-white rounded-3xl border border-emerald-200 shadow-sm overflow-hidden">
+        <div class="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 px-6 sm:px-10 py-7 text-white">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-emerald-100 block mb-1">
+            Act II • Rate Laws, Orders &amp; Half-Life
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            Decoding the Secret Recipe: Three Decay Personalities
+          </h2>
+          <p class="text-emerald-50 text-sm sm:text-base mt-2 max-w-3xl leading-relaxed">
+            <strong>Plot Twist:</strong> Balanced stoichiometric coefficients <em>cannot</em> predict reaction orders! The Rate Law <span class="font-mono bg-black/20 px-2 py-0.5 rounded-lg">Rate = k[A]ᵐ[B]ⁿ</span> must be discovered experimentally—and the units of <span class="font-mono">k</span> act as a fingerprint for the overall order.
+          </p>
+        </div>
+
+        <div class="p-6 sm:p-10 space-y-8">
+          <!-- Three Decay Personalities Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <!-- Zero-Order -->
+            <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-5 flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 text-xs font-extrabold">Zero-Order (m = 0)</span>
+                  <span class="font-mono text-xs font-bold text-slate-600">k unit: M s⁻¹</span>
+                </div>
+                <h3 class="font-extrabold text-slate-900 text-base">☕ Single Barista at Rush Hour</h3>
+                <p class="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
+                  Makes 1 espresso/min whether 10 or 50 people wait in line. Rate is constant; each successive half-life <strong>halves</strong> (<span class="font-mono">t½ = [A]₀ / 2k</span>).
+                </p>
+              </div>
+              <div class="pt-2 border-t border-slate-200 text-xs">
+                <span class="font-bold text-emerald-700">Real Life:</span> Liver alcohol metabolism (enzyme saturation).
+              </div>
+            </div>
+
+            <!-- First-Order -->
+            <div class="rounded-2xl border-2 border-emerald-300 bg-emerald-50/50 p-5 flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white text-xs font-extrabold">First-Order (m = 1)</span>
+                  <span class="font-mono text-xs font-bold text-emerald-800">k unit: s⁻¹</span>
+                </div>
+                <h3 class="font-extrabold text-slate-900 text-base">🪣 Leaking Water Tank</h3>
+                <p class="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
+                  Half-full tank has half the pressure and leaks half as fast. Thus, half-life is <strong>constant</strong> (<span class="font-mono">t½ = ln2/k = 0.693/k</span>), independent of <span class="font-mono">[A]₀</span>!
+                </p>
+              </div>
+              <div class="pt-2 border-t border-emerald-200 text-xs">
+                <span class="font-bold text-emerald-800">Real Life:</span> Carbon-14 dating &amp; antibiotic blood clearance.
+              </div>
+            </div>
+
+            <!-- Second-Order -->
+            <div class="rounded-2xl border border-slate-200 bg-slate-50/70 p-5 flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="px-2.5 py-1 rounded-lg bg-sky-100 text-sky-800 text-xs font-extrabold">Second-Order (m = 2)</span>
+                  <span class="font-mono text-xs font-bold text-slate-600">k unit: M⁻¹ s⁻¹</span>
+                </div>
+                <h3 class="font-extrabold text-slate-900 text-base">💃 Pairing Up on a Dance Floor</h3>
+                <p class="text-xs sm:text-sm text-slate-600 mt-1.5 leading-relaxed">
+                  When half the dancers leave, finding a partner in the sparser crowd takes <strong>twice as long</strong> (<span class="font-mono">t½ = 1 / k[A]₀</span>; <span class="font-mono">t½(II) = 2t½(I)</span>).
+                </p>
+              </div>
+              <div class="pt-2 border-t border-slate-200 text-xs">
+                <span class="font-bold text-emerald-700">Real Life:</span> Thermal breakdown of urban <span class="font-mono">NO₂</span> smog.
+              </div>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE SIMULATION 2: HALF-LIFE & LINEAR GRAPH DIAGNOSTIC LAB -->
+          <div class="rounded-2xl border-2 border-emerald-200 bg-slate-50/70 p-5 sm:p-6 space-y-5">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+              <div>
+                <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-emerald-700">
+                  <span>📊 Interactive Lab 2.1</span>
+                  <span id="badge-act2_sim" class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">Test Orders &amp; Linear Axes</span>
+                </div>
+                <h4 class="text-lg font-extrabold text-slate-900">Half-Life &amp; Linear Graph Diagnostic Lab</h4>
+              </div>
+
+              <!-- Order Selector -->
+              <div class="flex flex-wrap gap-2">
+                <button type="button" data-order="0" class="sim2-order-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:border-emerald-400">
+                  Zero-Order (0th)
+                </button>
+                <button type="button" data-order="1" class="sim2-order-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">
+                  First-Order (1st)
+                </button>
+                <button type="button" data-order="2" class="sim2-order-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:border-emerald-400">
+                  Second-Order (2nd)
+                </button>
+              </div>
+            </div>
+
+            <!-- Parameter Sliders -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-white p-4 rounded-2xl border border-slate-200">
+              <div>
+                <div class="flex justify-between text-xs font-bold mb-1">
+                  <span class="text-slate-600">Initial Concentration [A]₀</span>
+                  <span id="sim2-a0-val" class="font-mono text-emerald-700">1.00 M</span>
+                </div>
+                <input id="sim2-a0" type="range" min="0.50" max="1.20" step="0.10" value="1.00" class="w-full text-emerald-600" />
+              </div>
+              <div>
+                <div class="flex justify-between text-xs font-bold mb-1">
+                  <span class="text-slate-600">Rate Constant (k)</span>
+                  <span id="sim2-k-val" class="font-mono text-emerald-700">0.050 s⁻¹</span>
+                </div>
+                <input id="sim2-k" type="range" min="0.02" max="0.08" step="0.01" value="0.05" class="w-full text-emerald-600" />
+              </div>
+            </div>
+
+            <!-- Dual Synchronized Graphs -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Left Chart: [A] vs t with Successive Half-Lives -->
+              <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-3">
+                <div class="flex items-center justify-between">
+                  <h5 class="text-xs font-extrabold uppercase tracking-wider text-slate-700">1. Successive Half-Lives ([A] vs. Time)</h5>
+                  <span id="sim2-hl-badge" class="font-mono text-[11px] font-bold px-2.5 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">
+                    t½(II) = t½(I)
+                  </span>
+                </div>
+                <div class="canvas-wrap h-60">
+                  <canvas id="canvas-act2-hl"></canvas>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-xs font-mono bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  <div>1st Half-Life t½(I): <strong id="sim2-hl1" class="text-indigo-700">13.9 s</strong></div>
+                  <div>2nd Half-Life t½(II): <strong id="sim2-hl2" class="text-emerald-700">13.9 s</strong></div>
+                </div>
+              </div>
+
+              <!-- Right Chart: Linear Graph Diagnostic Test -->
+              <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-3">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <h5 class="text-xs font-extrabold uppercase tracking-wider text-slate-700">2. Linear Graph Diagnostic</h5>
+                  <div class="flex gap-1">
+                    <button type="button" data-yaxis="A" class="sim2-yaxis-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold bg-slate-100 text-slate-700">[A]</button>
+                    <button type="button" data-yaxis="lnA" class="sim2-yaxis-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold bg-emerald-600 text-white">ln[A]</button>
+                    <button type="button" data-yaxis="invA" class="sim2-yaxis-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold bg-slate-100 text-slate-700">1/[A]</button>
+                  </div>
+                </div>
+                <div class="canvas-wrap h-60">
+                  <canvas id="canvas-act2-lin"></canvas>
+                </div>
+                <div id="sim2-linear-status" class="text-xs font-bold px-3 py-2 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  ✓ STRAIGHT LINE! Plotting ln[A] vs. t yields a linear slope (-k), confirming 1st-Order kinetics.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- INITIAL RATE DETECTIVE MINI-LAB -->
+          <div class="rounded-2xl border-2 border-emerald-200 bg-white p-5 sm:p-6 space-y-5 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-emerald-700">
+                  <span>🕵️ Interactive Checkpoint 2.2 • Initial Rate Detective</span>
+                  <span id="badge-act2_detective" class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">Incomplete</span>
+                </div>
+                <h4 class="text-lg font-extrabold text-slate-900">Crack the Smog Rate Law: 2NO(g) + O₂(g) → 2NO₂(g)</h4>
+                <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
+                  Run virtual experiments by multiplying initial concentrations, observe how the initial rate responds, then deduce <span class="font-mono font-bold">Rate = k[NO]ᵐ[O₂]ⁿ</span>!
+                </p>
+              </div>
+            </div>
+
+            <!-- Experiment Controls -->
+            <div class="flex flex-wrap items-end gap-4 bg-emerald-50/60 p-4 rounded-2xl border border-emerald-100">
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">[NO] Multiplier (Base 0.010 M)</label>
+                <select id="det-no-mult" class="px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs font-bold">
+                  <option value="1">1× (0.010 M)</option>
+                  <option value="2" selected>2× (0.020 M)</option>
+                  <option value="3">3× (0.030 M)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-slate-700 mb-1">[O₂] Multiplier (Base 0.010 M)</label>
+                <select id="det-o2-mult" class="px-3 py-2 rounded-xl border border-slate-300 bg-white font-mono text-xs font-bold">
+                  <option value="1" selected>1× (0.010 M)</option>
+                  <option value="2">2× (0.020 M)</option>
+                  <option value="3">3× (0.030 M)</option>
+                </select>
+              </div>
+              <button type="button" onclick="runDetectiveExp()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold shadow-sm transition">
+                + Run Virtual Experiment
+              </button>
+            </div>
+
+            <!-- Experimental Data Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs sm:text-sm font-mono">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                    <th class="py-2.5 px-3 rounded-tl-xl">Exp #</th>
+                    <th class="py-2.5 px-3">[NO] (M)</th>
+                    <th class="py-2.5 px-3">[O₂] (M)</th>
+                    <th class="py-2.5 px-3 rounded-tr-xl">Initial Rate (M s⁻¹)</th>
+                  </tr>
+                </thead>
+                <tbody id="det-table-body" class="divide-y divide-slate-100">
+                  <tr>
+                    <td class="py-2 px-3 font-bold">1 (Baseline)</td>
+                    <td class="py-2 px-3">0.010</td>
+                    <td class="py-2 px-3">0.010</td>
+                    <td class="py-2 px-3 text-emerald-700 font-bold">7.00 × 10⁻⁴</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Deduction Submission -->
+            <div class="bg-slate-900 text-white p-4 sm:p-5 rounded-2xl flex flex-wrap items-center gap-4">
+              <div class="text-xs sm:text-sm font-mono flex flex-wrap items-center gap-2">
+                <span class="text-emerald-300 font-bold">Rate =</span>
+                <input id="det-k-input" type="number" placeholder="k (e.g. 700)" class="w-28 px-2.5 py-1.5 rounded-lg bg-white/10 border border-slate-600 text-white text-xs font-mono" />
+                <span>[NO]^</span>
+                <select id="det-m-input" class="px-2 py-1.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-xs font-mono">
+                  <option value="">m?</option>
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                </select>
+                <span>[O₂]^</span>
+                <select id="det-n-input" class="px-2 py-1.5 rounded-lg bg-slate-800 border border-slate-600 text-white text-xs font-mono">
+                  <option value="">n?</option>
+                  <option value="0">0</option>
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                </select>
+              </div>
+              <button type="button" onclick="verifyDetectiveLaw()" class="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold transition">
+                Submit Rate Law
+              </button>
+              <p id="det-feedback" class="w-full text-xs font-semibold text-emerald-200"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- ACT III: THE MOLECULAR ARENA (AMBER / ORANGE THEME)                 -->
+    <!-- =================================================================== -->
+    <section id="act-3" class="scroll-mt-28 space-y-8">
+      <div class="bg-white rounded-3xl border border-amber-200 shadow-sm overflow-hidden">
+        <div class="bg-gradient-to-r from-amber-500 via-orange-600 to-amber-600 px-6 sm:px-10 py-7 text-white">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-amber-100 block mb-1">
+            Act III • 1.2 Collision Theory &amp; Transition State Theory
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            Zooming Into the Molecular Arena
+          </h2>
+          <p class="text-amber-50 text-sm sm:text-base mt-2 max-w-3xl leading-relaxed">
+            Equations tell us <em>what</em> happens—now let's shrink down to see <em>why</em>! Molecules collide billions of times per second, yet almost all bounce off harmlessly unless <strong>two strict conditions</strong> are met simultaneously.
+          </p>
+        </div>
+
+        <div class="p-6 sm:p-10 space-y-8">
+          <!-- Analogies & Real-World Hook -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <div class="rounded-2xl bg-amber-50/80 border border-amber-200 p-5">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-amber-700 mb-1">🔑 Analogy 1: House Key &amp; Lock</div>
+              <h4 class="font-bold text-slate-900 mb-2">Condition 1: Proper Orientation</h4>
+              <p class="text-sm text-slate-700 leading-relaxed">
+                Even if you slam a key into a keyhole with huge force, the lock won't open if the key is upside down. Reacting molecules must collide at the exact angle that lets old bonds break and new bonds form.
+              </p>
+            </div>
+
+            <div class="rounded-2xl bg-orange-50/80 border border-orange-200 p-5">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-orange-700 mb-1">🏃 Analogy 2: Olympic Pole Vault</div>
+              <h4 class="font-bold text-slate-900 mb-2">Condition 2: Activation Energy (Eₐ) &amp; Activated Complex</h4>
+              <p class="text-sm text-slate-700 leading-relaxed">
+                Clearing the crossbar requires a minimum sprint energy (<span class="font-mono font-bold">Eₐ</span>). Hovering horizontally right above the bar is the unstable, high-energy <strong>Activated Complex</strong>—poised to drop forward into products or fall back into reactants!
+              </p>
+            </div>
+
+            <div class="rounded-2xl bg-slate-900 text-white p-5">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-amber-400 mb-1">🔥🧊 Real-World Thermal Hooks</div>
+              <h4 class="font-bold text-white mb-2">Matches &amp; Instant Cold Packs</h4>
+              <p class="text-sm text-slate-300 leading-relaxed">
+                A match sits safely in air until friction supplies <span class="font-mono text-amber-300">Eₐ</span> (exothermic, <span class="font-mono">ΔH = -ve</span>). Instant cold packs dissolve ammonium nitrate, absorbing heat as reactants climb to higher-energy products (endothermic, <span class="font-mono">ΔH = +ve</span>).
+              </p>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE SIMULATION 3: MOLECULAR COLLISION & ORIENTATION CANNON -->
+          <div class="rounded-2xl border-2 border-amber-200 bg-slate-50/80 p-5 sm:p-6 space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-amber-700">
+                  <span>💥 Interactive Lab 3.1</span>
+                  <span id="badge-act3_sim" class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">Achieve an Effective Collision</span>
+                </div>
+                <h4 class="text-lg font-extrabold text-slate-900">Molecular Collision &amp; Orientation Cannon: 2HI(g) → H₂(g) + I₂(g)</h4>
+              </div>
+
+              <!-- Quick Presets -->
+              <div class="flex flex-wrap gap-1.5">
+                <button type="button" onclick="setCollisionPreset(110, 0)" class="px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-amber-400 text-xs font-bold text-slate-700">
+                  Preset: Too Slow
+                </button>
+                <button type="button" onclick="setCollisionPreset(220, 75)" class="px-2.5 py-1.5 rounded-xl bg-white border border-slate-200 hover:border-amber-400 text-xs font-bold text-slate-700">
+                  Preset: Bad Angle
+                </button>
+                <button type="button" onclick="setCollisionPreset(220, 0)" class="px-2.5 py-1.5 rounded-xl bg-amber-100 border border-amber-300 hover:bg-amber-200 text-xs font-bold text-amber-900">
+                  Preset: Effective!
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+              <!-- Dark Arena Canvas -->
+              <div class="lg:col-span-7 bg-slate-950 rounded-2xl border border-slate-800 p-2 shadow-inner">
+                <div class="canvas-wrap h-64 sm:h-72">
+                  <canvas id="canvas-act3"></canvas>
+                </div>
+              </div>
+
+              <!-- Cannon Controls -->
+              <div class="lg:col-span-5 space-y-4">
+                <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-4">
+                  <!-- Kinetic Energy Slider -->
+                  <div>
+                    <div class="flex justify-between text-xs font-bold mb-1">
+                      <span class="text-slate-700">Collision Kinetic Energy (KE)</span>
+                      <span id="sim3-ke-val" class="font-mono text-amber-700">140 kJ/mol</span>
+                    </div>
+                    <input id="sim3-ke" type="range" min="60" max="260" step="10" value="140" class="w-full text-amber-500" />
+                    <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1">
+                      <span>60 kJ/mol</span>
+                      <span class="text-rose-600 font-bold">Threshold Eₐ = 180 kJ/mol</span>
+                      <span>260</span>
+                    </div>
+                  </div>
+
+                  <!-- Orientation Angle Slider -->
+                  <div>
+                    <div class="flex justify-between text-xs font-bold mb-1">
+                      <span class="text-slate-700">Molecular Orientation Tilt</span>
+                      <span id="sim3-ang-val" class="font-mono text-amber-700">45° (Misaligned)</span>
+                    </div>
+                    <input id="sim3-ang" type="range" min="0" max="90" step="5" value="45" class="w-full text-amber-500" />
+                    <div class="flex justify-between text-[11px] font-mono text-slate-400 mt-1">
+                      <span class="text-emerald-600 font-bold">0° (H–H / I–I Aligned)</span>
+                      <span>90° (Perpendicular)</span>
+                    </div>
+                  </div>
+
+                  <button id="sim3-launch" type="button" class="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm font-extrabold shadow-md transition">
+                    🚀 Launch Collision!
+                  </button>
+                </div>
+
+                <!-- Collision Outcome Banner -->
+                <div id="sim3-outcome" class="rounded-2xl border border-slate-200 bg-white p-4 text-xs sm:text-sm text-slate-700 leading-relaxed">
+                  Adjust Kinetic Energy (≥ 180 kJ/mol) and Orientation (≤ 20°), then click <strong>Launch Collision!</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DRAG & DROP ACTIVITY 2: ENERGY PROFILE DIAGRAM BUILDER -->
+          <div class="rounded-2xl border-2 border-amber-200 bg-white p-5 sm:p-6 space-y-5 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-amber-700">
+                  <span>⛰️ Interactive Checkpoint 3.2 (Drag &amp; Drop or Tap)</span>
+                  <span id="badge-act3_dnd" class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">Incomplete</span>
+                </div>
+                <h4 class="text-lg font-extrabold text-slate-900">Energy Profile Diagram &amp; Transition State Builder</h4>
+                <p class="text-xs sm:text-sm text-slate-600 mt-0.5">
+                  Drag (or tap) the 6 thermodynamic &amp; kinetic labels onto their exact locations on the reaction coordinate diagram.
+                </p>
+              </div>
+
+              <!-- Exo / Endo Mode Switcher -->
+              <div class="flex items-center gap-2">
+                <button type="button" id="ep-mode-exo" onclick="setEnergyProfileMode('exo')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-600 text-white shadow-sm">
+                  Exothermic (ΔH = -ve)
+                </button>
+                <button type="button" id="ep-mode-endo" onclick="setEnergyProfileMode('endo')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200">
+                  Endothermic (ΔH = +ve)
+                </button>
+                <button type="button" onclick="resetDndGroup('act3')" class="px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-600">
+                  ↺ Reset
+                </button>
+              </div>
+            </div>
+
+            <!-- Label Bank -->
+            <div class="bg-amber-50/60 rounded-2xl p-3.5 border border-amber-200">
+              <span class="text-[11px] font-bold uppercase tracking-wider text-amber-800 block mb-2">Energy Profile Labels (Drag or Tap onto Diagram Slots):</span>
+              <div id="bank-act3" class="flex flex-wrap gap-2">
+                <button type="button" class="dnd-chip px-3 py-1.5 rounded-xl bg-white border-2 border-amber-300 text-xs font-extrabold text-slate-800 shadow-sm" data-group="act3" data-val="Reactants">Reactants</button>
+                <button type="button" class="dnd-chip px-3 py-1.5 rounded-xl bg-white border-2 border-amber-300 text-xs font-extrabold text-slate-800 shadow-sm" data-group="act3" data-val="Products">Products</button>
+                <button type="button" class="dnd-chip px-3 py-1.5 rounded-xl bg-white border-2 border-rose-300 text-xs font-extrabold text-rose-800 shadow-sm" data-group="act3" data-val="Activated Complex">Activated Complex</button>
+                <button type="button" class="dnd-chip px-3 py-1.5 rounded-xl bg-white border-2 border-indigo-300 text-xs font-extrabold text-indigo-800 shadow-sm" data-group="act3" data-val="Ea (forward)">Ea (forward)</button>
+                <button type="button" class="dnd-chip px-3 py-1.5 rounded-xl bg-white border-2 border-purple-300 text-xs font-extrabold text-purple-800 shadow-sm" data-group="act3" data-val="Ea (reverse)">Ea (reverse)</button>
+                <button type="button" class="dnd-chip px-3 py-1.5 rounded-xl bg-white border-2 border-emerald-300 text-xs font-extrabold text-emerald-800 shadow-sm" data-group="act3" data-val="ΔH">ΔH</button>
+              </div>
+            </div>
+
+            <!-- Interactive SVG + Positioned Drop Zones -->
+            <div class="relative w-full max-w-3xl mx-auto bg-slate-50 rounded-2xl border border-slate-200 p-3 sm:p-4">
+              <div class="relative w-full h-72 sm:h-80">
+                <!-- Dynamic SVG Curve -->
+                <svg id="ep-svg" viewBox="0 0 600 300" class="w-full h-full overflow-visible">
+                  <!-- Axes -->
+                  <line x1="50" y1="20" x2="50" y2="270" stroke="#334155" stroke-width="2.5" />
+                  <polygon points="50,14 45,24 55,24" fill="#334155" />
+                  <line x1="50" y1="270" x2="575" y2="270" stroke="#334155" stroke-width="2.5" />
+                  <polygon points="582,270 572,265 572,275" fill="#334155" />
+                  <text x="14" y="150" transform="rotate(-90 14,150)" font-size="12" font-weight="700" fill="#334155" text-anchor="middle">Potential Energy (kJ/mol)</text>
+                  <text x="315" y="292" font-size="12" font-weight="700" fill="#334155" text-anchor="middle">Progress of Reaction</text>
+
+                  <!-- Exothermic Curve & Guides (Default visible) -->
+                  <g id="ep-group-exo">
+                    <path d="M 70 155 L 155 155 C 210 155, 240 48, 295 48 C 350 48, 385 225, 445 225 L 545 225"
+                      fill="none" stroke="#d97706" stroke-width="4" stroke-linecap="round" />
+                    <!-- Dashed reference lines -->
+                    <line x1="155" y1="155" x2="420" y2="155" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4" />
+                    <line x1="295" y1="48" x2="475" y2="48" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4" />
+                    <!-- Ea forward arrow -->
+                    <line x1="230" y1="155" x2="230" y2="52" stroke="#4f46e5" stroke-width="2" />
+                    <polygon points="230,48 226,56 234,56" fill="#4f46e5" />
+                    <!-- Ea reverse arrow -->
+                    <line x1="465" y1="225" x2="465" y2="52" stroke="#9333ea" stroke-width="2" />
+                    <polygon points="465,48 461,56 469,56" fill="#9333ea" />
+                    <!-- ΔH arrow -->
+                    <line x1="410" y1="155" x2="410" y2="221" stroke="#059669" stroke-width="2.5" />
+                    <polygon points="410,225 406,217 414,217" fill="#059669" />
+                  </g>
+
+                  <!-- Endothermic Curve & Guides (Hidden initially) -->
+                  <g id="ep-group-endo" class="hidden">
+                    <path d="M 70 225 L 155 225 C 210 225, 240 48, 295 48 C 350 48, 385 145, 445 145 L 545 145"
+                      fill="none" stroke="#ea580c" stroke-width="4" stroke-linecap="round" />
+                    <!-- Dashed reference lines -->
+                    <line x1="155" y1="225" x2="420" y2="225" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4" />
+                    <line x1="295" y1="48" x2="475" y2="48" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4" />
+                    <!-- Ea forward arrow -->
+                    <line x1="230" y1="225" x2="230" y2="52" stroke="#4f46e5" stroke-width="2" />
+                    <polygon points="230,48 226,56 234,56" fill="#4f46e5" />
+                    <!-- Ea reverse arrow -->
+                    <line x1="465" y1="145" x2="465" y2="52" stroke="#9333ea" stroke-width="2" />
+                    <polygon points="465,48 461,56 469,56" fill="#9333ea" />
+                    <!-- ΔH arrow -->
+                    <line x1="410" y1="225" x2="410" y2="149" stroke="#059669" stroke-width="2.5" />
+                    <polygon points="410,145 406,153 414,153" fill="#059669" />
+                  </g>
+                </svg>
+
+                <!-- 6 Drop Zone Hotspots Overlaid Responsively -->
+                <div id="ep-slot-peak" class="dnd-zone absolute top-[2%] left-[49%] -translate-x-1/2 px-2.5 py-1 rounded-lg bg-white/95 border-2 border-dashed border-rose-400 text-[10px] sm:text-xs font-bold text-slate-400 shadow-sm text-center min-w-[110px]"
+                  data-group="act3" data-slot="peak" data-answer="Activated Complex">Drop Summit</div>
+
+                <div id="ep-slot-react" class="dnd-zone absolute top-[41%] left-[12%] px-2 py-1 rounded-lg bg-white/95 border-2 border-dashed border-amber-400 text-[10px] sm:text-xs font-bold text-slate-400 shadow-sm text-center min-w-[85px]"
+                  data-group="act3" data-slot="react" data-answer="Reactants">Drop Left</div>
+
+                <div id="ep-slot-prod" class="dnd-zone absolute top-[78%] left-[74%] px-2 py-1 rounded-lg bg-white/95 border-2 border-dashed border-amber-400 text-[10px] sm:text-xs font-bold text-slate-400 shadow-sm text-center min-w-[85px]"
+                  data-group="act3" data-slot="prod" data-answer="Products">Drop Right</div>
+
+                <div id="ep-slot-eafwd" class="dnd-zone absolute top-[32%] left-[24%] px-2 py-1 rounded-lg bg-white/95 border-2 border-dashed border-indigo-400 text-[10px] sm:text-xs font-bold text-slate-400 shadow-sm text-center min-w-[88px]"
+                  data-group="act3" data-slot="eafwd" data-answer="Ea (forward)">Drop Arrow 1</div>
+
+                <div id="ep-slot-earev" class="dnd-zone absolute top-[34%] left-[78%] px-2 py-1 rounded-lg bg-white/95 border-2 border-dashed border-purple-400 text-[10px] sm:text-xs font-bold text-slate-400 shadow-sm text-center min-w-[88px]"
+                  data-group="act3" data-slot="earev" data-answer="Ea (reverse)">Drop Arrow 2</div>
+
+                <div id="ep-slot-dh" class="dnd-zone absolute top-[57%] left-[59%] px-2 py-1 rounded-lg bg-white/95 border-2 border-dashed border-emerald-400 text-[10px] sm:text-xs font-bold text-slate-400 shadow-sm text-center min-w-[68px]"
+                  data-group="act3" data-slot="dh" data-answer="ΔH">Drop Gap</div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <button type="button" onclick="verifyAct3Dnd()" class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs sm:text-sm font-bold shadow-sm transition">
+                Verify Energy Profile Labels
+              </button>
+              <p id="act3-dnd-feedback" class="text-xs sm:text-sm font-semibold text-slate-600"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- ACT IV: BECOMING THE MASTER CONTROLLER (ROSE / VIOLET THEME)        -->
+    <!-- =================================================================== -->
+    <section id="act-4" class="scroll-mt-28 space-y-8">
+      <div class="bg-white rounded-3xl border border-rose-200 shadow-sm overflow-hidden">
+        <div class="bg-gradient-to-r from-rose-600 via-pink-600 to-violet-700 px-6 sm:px-10 py-7 text-white">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-rose-100 block mb-1">
+            Act IV • 1.3 Factors Affecting Reaction Rate &amp; Arrhenius Equation
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            Becoming the Master Controller: Mountain Pass vs. Tunnel
+          </h2>
+          <p class="text-rose-50 text-sm sm:text-base mt-2 max-w-3xl leading-relaxed">
+            Imagine hikers trying to cross a mountain ridge (<span class="font-mono bg-black/20 px-1.5 py-0.5 rounded">Eₐ</span>). You can pack more hikers onto the trail (<strong>Concentration</strong>), break boulders into gravel (<strong>Surface Area</strong>), hand out energy drinks (<strong>Temperature</strong>), or drill a <strong>Tunnel</strong> straight through the rock (<strong>Catalyst</strong>)!
+          </p>
+        </div>
+
+        <div class="p-6 sm:p-10 space-y-8">
+          <!-- Real-World Hooks Strip -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="rounded-2xl bg-rose-50/70 border border-rose-200 p-4">
+              <span class="text-xs font-extrabold uppercase text-rose-700">🌾 Surface Area Hook</span>
+              <h4 class="font-bold text-slate-900 text-sm mt-1">Grain Elevator Flour Explosions</h4>
+              <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                Whole wheat kernels burn slowly, but airborne flour dust has massive exposed surface area and can detonate from a single spark.
+              </p>
+            </div>
+            <div class="rounded-2xl bg-violet-50/70 border border-violet-200 p-4">
+              <span class="text-xs font-extrabold uppercase text-violet-700">🧊🍲 Temperature Hook</span>
+              <h4 class="font-bold text-slate-900 text-sm mt-1">Refrigerators vs. Pressure Cookers</h4>
+              <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                Cooling shifts the Maxwell-Boltzmann curve left so spoilage bacteria lack <span class="font-mono">Eₐ</span>; pressure cookers raise boiling point to speed cooking.
+              </p>
+            </div>
+            <div class="rounded-2xl bg-slate-900 text-white p-4">
+              <span class="text-xs font-extrabold uppercase text-amber-400">🚗🧬 Catalyst Hook</span>
+              <h4 class="font-bold text-white text-sm mt-1">Catalytic Converters &amp; Enzymes</h4>
+              <p class="text-xs text-slate-300 mt-1 leading-relaxed">
+                Platinum-rhodium honeycombs detoxify car exhaust by providing a lower-<span class="font-mono text-amber-300">Eₐ</span> pathway without changing <span class="font-mono">ΔH</span>.
+              </p>
+            </div>
+          </div>
+
+          <!-- INTERACTIVE SIMULATION 4: REACTION CHAMBER + MAXWELL-BOLTZMANN CURVE -->
+          <div class="rounded-2xl border-2 border-rose-200 bg-slate-50/80 p-5 sm:p-6 space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-rose-700">
+                  <span>⚗️ Interactive Lab 4.1</span>
+                  <span id="badge-act4_sim" class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-600">Adjust Factors &amp; Catalyst</span>
+                </div>
+                <h4 class="text-lg font-extrabold text-slate-900">Multi-Factor Reaction Chamber &amp; Live Maxwell–Boltzmann Curve</h4>
+              </div>
+              <div class="px-3.5 py-1.5 rounded-xl bg-slate-900 text-white font-mono text-xs font-bold flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Relative Rate:</span>
+                <span id="sim4-rate-readout" class="text-emerald-400 text-sm">1.0×</span>
+              </div>
+            </div>
+
+            <!-- 4 Factor Controls Bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 bg-white p-4 rounded-2xl border border-slate-200">
+              <!-- 1. Concentration -->
+              <div class="space-y-1.5">
+                <label class="text-xs font-extrabold text-slate-700 block">1. Concentration</label>
+                <div class="grid grid-cols-3 gap-1">
+                  <button type="button" data-conc="low" class="sim4-conc-btn py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700">Low</button>
+                  <button type="button" data-conc="med" class="sim4-conc-btn py-1.5 rounded-lg text-xs font-bold bg-rose-600 text-white">Med</button>
+                  <button type="button" data-conc="high" class="sim4-conc-btn py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700">High</button>
+                </div>
+              </div>
+
+              <!-- 2. Particle Size -->
+              <div class="space-y-1.5">
+                <label class="text-xs font-extrabold text-slate-700 block">2. Solid Particle Size</label>
+                <div class="grid grid-cols-2 gap-1">
+                  <button type="button" data-size="lump" class="sim4-size-btn py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700">1 Large Lump</button>
+                  <button type="button" data-size="powder" class="sim4-size-btn py-1.5 rounded-lg text-xs font-bold bg-rose-600 text-white">Fine Powder</button>
+                </div>
+              </div>
+
+              <!-- 3. Temperature -->
+              <div class="space-y-1.5">
+                <div class="flex justify-between text-xs font-extrabold">
+                  <span class="text-slate-700">3. Temperature</span>
+                  <span id="sim4-temp-val" class="font-mono text-rose-600">300 K</span>
+                </div>
+                <input id="sim4-temp" type="range" min="280" max="450" step="10" value="300" class="w-full text-rose-600" />
+              </div>
+
+              <!-- 4. Catalyst Toggle -->
+              <div class="space-y-1.5">
+                <label class="text-xs font-extrabold text-slate-700 block">4. Catalyst (Lowers Eₐ)</label>
+                <button id="sim4-cat-btn" type="button" class="w-full py-1.5 px-3 rounded-lg text-xs font-extrabold border-2 border-violet-300 bg-violet-50 text-violet-800 hover:bg-violet-100 transition">
+                  Catalyst: OFF (Eₐ = 75 kJ)
+                </button>
+              </div>
+            </div>
+
+            <!-- Dual Visual Panels -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Left: Live Particle Box -->
+              <div class="bg-slate-950 rounded-2xl border border-slate-800 p-3 space-y-2">
+                <div class="flex justify-between items-center text-xs text-slate-300 px-1">
+                  <span class="font-bold">Live Molecular Collision Box</span>
+                  <span id="sim4-surface-label" class="font-mono text-[11px] text-amber-300">High Surface Area (Powder)</span>
+                </div>
+                <div class="canvas-wrap h-60">
+                  <canvas id="canvas-act4-box"></canvas>
+                </div>
+              </div>
+
+              <!-- Right: Maxwell-Boltzmann Distribution Curve -->
+              <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-2">
+                <div class="flex justify-between items-center text-xs">
+                  <span class="font-extrabold text-slate-800">Maxwell–Boltzmann Energy Distribution</span>
+                  <span id="sim4-frac-badge" class="font-mono text-xs font-extrabold px-2.5 py-0.5 rounded-lg bg-rose-50 text-rose-700 border border-rose-200">
+                    E ≥ Eₐ: 8.4%
+                  </span>
+                </div>
+                <div class="canvas-wrap h-60">
+                  <canvas id="canvas-act4-mb"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ARRHENIUS EQUATION EXPLORER & MILK SPOILAGE SOLVER -->
+          <div class="rounded-2xl border-2 border-violet-200 bg-white p-5 sm:p-6 space-y-5 shadow-sm">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-violet-700">
+                  <span>📈 Interactive Checkpoint 4.2 • The Arrhenius Equation</span>
+                  <span id="badge-act4_arrhenius" class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">Incomplete</span>
+                </div>
+                <h4 class="text-lg font-extrabold text-slate-900">Linking k, Temperature &amp; Activation Energy: k = A·e^(-Eₐ/RT)</h4>
+              </div>
+              <span class="font-mono text-xs bg-violet-50 text-violet-800 border border-violet-200 px-3 py-1 rounded-xl font-bold">
+                ln k = (-Eₐ/R)(1/T) + ln A
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+              <!-- Interactive Arrhenius Plot -->
+              <div class="lg:col-span-6 bg-slate-50 rounded-2xl border border-slate-200 p-4 space-y-3">
+                <div class="flex justify-between items-center text-xs font-bold">
+                  <span class="text-slate-700">Explore Slope (-Eₐ / R) by Varying Eₐ:</span>
+                  <span id="arr-ea-val" class="font-mono text-violet-700">Eₐ = 80 kJ/mol</span>
+                </div>
+                <input id="arr-ea-slider" type="range" min="40" max="160" step="5" value="80" class="w-full text-violet-600" />
+                <div class="canvas-wrap h-52 bg-white rounded-xl border border-slate-200">
+                  <canvas id="canvas-act4-arr"></canvas>
+                </div>
+              </div>
+
+              <!-- Worked Problem Solver: Milk Spoilage -->
+              <div class="lg:col-span-6 bg-violet-950 text-violet-50 rounded-2xl p-5 space-y-3.5">
+                <span class="text-xs font-extrabold uppercase tracking-wider text-violet-300">Worked Problem • Food Preservation</span>
+                <p class="text-xs sm:text-sm text-violet-100 leading-relaxed">
+                  The rate constant <span class="font-mono">k</span> for a bacterial milk-spoilage reaction <strong>doubles</strong> when temperature rises from <span class="font-mono text-white">27°C (300.15 K)</span> to <span class="font-mono text-white">37°C (310.15 K)</span>.
+                  Using <span class="font-mono text-amber-300">ln(k₁/k₂) = (Eₐ/R)(1/T₂ - 1/T₁)</span> with <span class="font-mono">R = 8.314 J mol⁻¹ K⁻¹</span>, calculate <span class="font-mono font-bold text-white">Eₐ</span> in <strong>kJ mol⁻¹</strong>:
+                </p>
+                <div class="flex flex-wrap items-center gap-2 pt-1">
+                  <input id="arr-calc-input" type="number" step="0.1" placeholder="e.g. 53.7"
+                    class="w-32 px-3 py-2 rounded-xl bg-white/10 border border-violet-400/40 text-white font-mono text-sm focus:outline-none focus:border-amber-400" />
+                  <span class="font-mono text-xs text-violet-200">kJ mol⁻¹</span>
+                  <button type="button" onclick="checkArrheniusProblem()" class="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-extrabold transition">
+                    Verify Eₐ
+                  </button>
+                </div>
+                <p id="arr-calc-feedback" class="text-xs font-semibold text-amber-200"></p>
+                <details class="text-xs text-violet-200 bg-white/5 rounded-xl p-3 border border-white/10">
+                  <summary class="cursor-pointer font-bold text-violet-100">Show Step-by-Step Hint</summary>
+                  <div class="mt-2 font-mono space-y-1 text-[11px]">
+                    <div>1. k₂ = 2k₁ ⇒ ln(k₁/k₂) = ln(0.5) = -0.6931</div>
+                    <div>2. 1/T₂ - 1/T₁ = 1/310.15 - 1/300.15 = -1.074 × 10⁻⁴ K⁻¹</div>
+                    <div>3. Eₐ = (-0.6931 × 8.314) / (-1.074 × 10⁻⁴) = 53,650 J/mol ≈ 53.7 kJ/mol</div>
+                  </div>
+                </details>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =================================================================== -->
+    <!-- EPILOGUE: STORY BLUEPRINT & BOSS MASTERY CHECK (SLATE / GOLD)       -->
+    <!-- =================================================================== -->
+    <section id="epilogue" class="scroll-mt-28 space-y-8 pb-12">
+      <div class="bg-white rounded-3xl border border-slate-300 shadow-sm overflow-hidden">
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 px-6 sm:px-10 py-7 text-white">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-amber-400 block mb-1">
+            Epilogue • Story Synthesis &amp; Mastery Check
+          </span>
+          <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            The Complete Reaction Kinetics Blueprint
+          </h2>
+          <p class="text-slate-300 text-sm sm:text-base mt-2 max-w-3xl">
+            Tie all four Acts together! Match each Story Act to its anchor analogy, then conquer the 5-question Boss Mastery Check to earn your studio completion certificate.
+          </p>
+        </div>
+
+        <div class="p-6 sm:p-10 space-y-10">
+          <!-- DRAG & DROP CONCEPT MATCHER -->
+          <div class="rounded-2xl border-2 border-slate-200 bg-slate-50/70 p-5 sm:p-6 space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-slate-700">
+                  <span>🗺️ Interactive Checkpoint 5.1 (Drag &amp; Drop or Tap)</span>
+                  <span id="badge-epilogue_dnd" class="px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">Incomplete</span>
+                </div>
+                <h4 class="text-lg font-extrabold text-slate-900">Match Each Story Act with Its Anchor Analogy</h4>
+              </div>
+              <button type="button" onclick="resetDndGroup('epi')" class="px-3 py-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-xs font-bold text-slate-700">
+                ↺ Reset Blueprint
+              </button>
+            </div>
+
+            <!-- Analogy Chips -->
+            <div id="bank-epi" class="flex flex-wrap gap-2 bg-white p-3.5 rounded-2xl border border-slate-200">
+              <button type="button" class="dnd-chip px-3.5 py-2 rounded-xl bg-amber-50 border-2 border-amber-300 text-xs font-extrabold text-amber-900 shadow-sm" data-group="epi" data-val="Key in Lock & Pole Vault">🔑 Key in Lock &amp; Pole Vault</button>
+              <button type="button" class="dnd-chip px-3.5 py-2 rounded-xl bg-indigo-50 border-2 border-indigo-300 text-xs font-extrabold text-indigo-900 shadow-sm" data-group="epi" data-val="Speedometer & Bicycle Factory">🚗 Speedometer &amp; Bicycle Factory</button>
+              <button type="button" class="dnd-chip px-3.5 py-2 rounded-xl bg-rose-50 border-2 border-rose-300 text-xs font-extrabold text-rose-900 shadow-sm" data-group="epi" data-val="Mountain Pass & Tunnel">⛰️ Mountain Pass &amp; Tunnel</button>
+              <button type="button" class="dnd-chip px-3.5 py-2 rounded-xl bg-emerald-50 border-2 border-emerald-300 text-xs font-extrabold text-emerald-900 shadow-sm" data-group="epi" data-val="Barista, Tank & Dance Floor">☕ Barista, Tank &amp; Dance Floor</button>
+            </div>
+
+            <!-- 4-Row Blueprint Table -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-white rounded-2xl border border-indigo-200 p-4 flex flex-col justify-between gap-3">
+                <div>
+                  <span class="text-xs font-extrabold text-indigo-600 uppercase">Act I: The Clock (1.1)</span>
+                  <p class="text-xs text-slate-600 font-mono mt-0.5">-(1/a)d[A]/dt = +(1/c)d[C]/dt</p>
+                </div>
+                <div class="dnd-zone min-h-[44px] rounded-xl border-2 border-dashed border-indigo-300 px-3 py-2 flex items-center justify-center text-xs font-bold text-slate-400"
+                  data-group="epi" data-slot="e1" data-answer="Speedometer & Bicycle Factory">Drop Act I Analogy Here</div>
+              </div>
+
+              <div class="bg-white rounded-2xl border border-emerald-200 p-4 flex flex-col justify-between gap-3">
+                <div>
+                  <span class="text-xs font-extrabold text-emerald-600 uppercase">Act II: The Recipe (Rate Laws)</span>
+                  <p class="text-xs text-slate-600 font-mono mt-0.5">Rate = k[A]ᵐ[B]ⁿ ; Half-Life t½</p>
+                </div>
+                <div class="dnd-zone min-h-[44px] rounded-xl border-2 border-dashed border-emerald-300 px-3 py-2 flex items-center justify-center text-xs font-bold text-slate-400"
+                  data-group="epi" data-slot="e2" data-answer="Barista, Tank & Dance Floor">Drop Act II Analogy Here</div>
+              </div>
+
+              <div class="bg-white rounded-2xl border border-amber-200 p-4 flex flex-col justify-between gap-3">
+                <div>
+                  <span class="text-xs font-extrabold text-amber-600 uppercase">Act III: The Arena (1.2)</span>
+                  <p class="text-xs text-slate-600 font-mono mt-0.5">Effective Collisions &amp; Activated Complex</p>
+                </div>
+                <div class="dnd-zone min-h-[44px] rounded-xl border-2 border-dashed border-amber-300 px-3 py-2 flex items-center justify-center text-xs font-bold text-slate-400"
+                  data-group="epi" data-slot="e3" data-answer="Key in Lock & Pole Vault">Drop Act III Analogy Here</div>
+              </div>
+
+              <div class="bg-white rounded-2xl border border-rose-200 p-4 flex flex-col justify-between gap-3">
+                <div>
+                  <span class="text-xs font-extrabold text-rose-600 uppercase">Act IV: The Controls (1.3)</span>
+                  <p class="text-xs text-slate-600 font-mono mt-0.5">k = A·e^(-Ea/RT) &amp; Maxwell-Boltzmann</p>
+                </div>
+                <div class="dnd-zone min-h-[44px] rounded-xl border-2 border-dashed border-rose-300 px-3 py-2 flex items-center justify-center text-xs font-bold text-slate-400"
+                  data-group="epi" data-slot="e4" data-answer="Mountain Pass & Tunnel">Drop Act IV Analogy Here</div>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-3">
+              <button type="button" onclick="verifyEpilogueDnd()" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs sm:text-sm font-bold shadow-sm transition">
+                Verify Story Blueprint
+              </button>
+              <p id="epi-dnd-feedback" class="text-xs sm:text-sm font-semibold text-slate-600"></p>
+            </div>
+          </div>
+
+          <!-- 5-QUESTION BOSS MASTERY QUIZ -->
+          <div class="space-y-5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <div class="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-amber-600">
+                  <span>🏆 Interactive Checkpoint 5.2 • Boss Mastery Quiz</span>
+                  <span id="badge-epilogue_quiz" class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">0 / 5 Answered</span>
+                </div>
+                <h4 class="text-xl font-extrabold text-slate-900">Final Self-Learning Assessment</h4>
+              </div>
+            </div>
+
+            <div id="quiz-container" class="space-y-4">
+              <!-- Rendered dynamically by JS -->
+            </div>
+
+            <!-- Dynamic Completion Certificate Banner -->
+            <div id="certificate-banner" class="hidden rounded-3xl bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 p-1 shadow-lg">
+              <div class="bg-slate-950 text-white rounded-[22px] p-6 sm:p-8 text-center space-y-3">
+                <div class="text-4xl">🎓⚗️🏆</div>
+                <span class="text-xs font-extrabold uppercase tracking-widest text-amber-400">Reaction Kinetics Studio Mastery</span>
+                <h3 class="text-2xl sm:text-3xl font-extrabold">Master Controller of Chemical Speed!</h3>
+                <p id="cert-summary" class="text-sm text-slate-300 max-w-xl mx-auto">
+                  You have completed the interactive simulations, drag-and-drop checkpoints, and Boss Mastery Quiz!
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- JAVASCRIPT ENGINE: SIMULATIONS, UNIVERSAL DRAG-DROP, AUDIO & QUIZ     -->
+  <!-- ===================================================================== -->
+  <script>
+    /* =========================================================================
+       1. SOUND EFFECTS SYNTHESIZER (Web Audio API - Zero External URLs)
+       ========================================================================= */
+    const SoundFX = {
+      enabled: true,
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+      },
+      playTone(freq, type = 'sine', duration = 0.14, gainVal = 0.08) {
+        if (!this.enabled) return;
+        try {
+          this.init();
+          if (!this.ctx) return;
+          if (this.ctx.state === 'suspended') this.ctx.resume();
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch (e) { /* Ignore audio block if any */ }
+      },
+      pop() { this.playTone(520, 'sine', 0.09, 0.07); },
+      success() {
+        this.playTone(523.25, 'triangle', 0.15, 0.09);
+        setTimeout(() => this.playTone(659.25, 'triangle', 0.15, 0.09), 90);
+        setTimeout(() => this.playTone(783.99, 'triangle', 0.25, 0.1), 180);
+      },
+      error() {
+        this.playTone(210, 'sawtooth', 0.18, 0.06);
+      },
+      boom() {
+        this.playTone(140, 'triangle', 0.25, 0.12);
+        setTimeout(() => this.playTone(620, 'sine', 0.2, 0.08), 80);
+      }
+    };
+
+    function toggleSound() {
+      SoundFX.enabled = !SoundFX.enabled;
+      const icon = SoundFX.enabled ? '🔊' : '🔇';
+      document.getElementById('sound-icon-m').textContent = icon;
+      document.getElementById('sound-icon-d').textContent = icon;
+      if (SoundFX.enabled) SoundFX.pop();
+    }
+    document.getElementById('sound-toggle').addEventListener('click', toggleSound);
+    document.getElementById('sound-toggle-desktop').addEventListener('click', toggleSound);
+
+    /* =========================================================================
+       2. GLOBAL MASTERY PROGRESS & TOAST SYSTEM
+       ========================================================================= */
+    const MILESTONES = [
+      'act1_sim',
+      'act1_dnd',
+      'act1_num',
+      'act2_sim',
+      'act2_detective',
+      'act3_sim',
+      'act3_dnd',
+      'act4_sim',
+      'act4_arrhenius',
+      'epilogue_dnd',
+      'epilogue_quiz'
+    ];
+    const completedSet = new Set();
+    let toastTimer = null;
+
+    function showToast(title, msg, emoji = '🎉') {
+      const banner = document.getElementById('toast-banner');
+      document.getElementById('toast-title').textContent = title;
+      document.getElementById('toast-msg').textContent = msg;
+      document.getElementById('toast-emoji').textContent = emoji;
+      banner.classList.remove('translate-y-24', 'opacity-0');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => {
+        banner.classList.add('translate-y-24', 'opacity-0');
+      }, 3400);
+    }
+
+    function completeMilestone(id, label) {
+      if (completedSet.has(id)) return;
+      completedSet.add(id);
+      SoundFX.success();
+
+      const badge = document.getElementById(`badge-${id}`);
+      if (badge) {
+        badge.textContent = '✓ Completed';
+        badge.className = 'px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-extrabold';
+      }
+
+      const pct = Math.round((completedSet.size / MILESTONES.length) * 100);
+      document.getElementById('mastery-percent').textContent = `${pct}%`;
+      document.getElementById('mastery-bar').style.width = `${pct}%`;
+
+      // Update Stepper checkmarks
+      const stepChecks = {
+        'act-1': ['act1_sim', 'act1_dnd'],
+        'act-2': ['act2_sim', 'act2_detective'],
+        'act-3': ['act3_sim', 'act3_dnd'],
+        'act-4': ['act4_sim', 'act4_arrhenius'],
+        'epilogue': ['epilogue_dnd', 'epilogue_quiz']
+      };
+      Object.entries(stepChecks).forEach(([stepId, reqs]) => {
+        if (reqs.every(r => completedSet.has(r))) {
+          const pill = document.querySelector(`.step-pill[data-step="${stepId}"] .step-check`);
+          if (pill) pill.classList.remove('hidden');
+        }
+      });
+
+      if (label) {
+        showToast('Checkpoint Unlocked!', label, '✨');
+      }
+      checkCertificateUnlock();
+    }
+
+    /* =========================================================================
+       3. UNIVERSAL POINTER + TAP DRAG-AND-DROP ENGINE
+       ========================================================================= */
+    let selectedChipEl = null; // For tap-to-select -> tap-to-place accessibility
+    let activeDrag = null;
+
+    function placeChipInZone(chip, zone) {
+      if (!chip || !zone) return;
+      if (chip.dataset.group !== zone.dataset.group) {
+        SoundFX.error();
+        return;
+      }
+
+      // If zone already has a value, return previous chip to bank
+      if (zone.dataset.filledChipId) {
+        const prevChip = document.getElementById(zone.dataset.filledChipId);
+        if (prevChip) prevChip.classList.remove('opacity-30', 'pointer-events-none');
+      }
+
+      // Assign unique ID to chip if missing
+      if (!chip.id) chip.id = 'chip-' + Math.random().toString(36).slice(2, 9);
+
+      zone.textContent = chip.dataset.val;
+      zone.dataset.currentVal = chip.dataset.val;
+      zone.dataset.filledChipId = chip.id;
+      zone.classList.remove('border-dashed', 'text-slate-400', 'border-rose-500', 'bg-rose-50');
+      zone.classList.add('border-solid', 'bg-indigo-50', 'text-slate-900', 'font-extrabold');
+
+      chip.classList.add('opacity-30', 'pointer-events-none');
+      chip.classList.remove('selected-chip');
+      selectedChipEl = null;
+      SoundFX.pop();
+    }
+
+    function resetDndGroup(group) {
+      document.querySelectorAll(`.dnd-chip[data-group="${group}"]`).forEach(chip => {
+        chip.classList.remove('opacity-30', 'pointer-events-none', 'selected-chip');
+      });
+      document.querySelectorAll(`.dnd-zone[data-group="${group}"]`).forEach(zone => {
+        zone.textContent = zone.dataset.placeholder || 'Drop';
+        delete zone.dataset.currentVal;
+        delete zone.dataset.filledChipId;
+        zone.classList.add('border-dashed', 'text-slate-400');
+        zone.classList.remove('border-solid', 'bg-indigo-50', 'bg-emerald-50', 'bg-rose-50', 'text-slate-900', 'border-emerald-500', 'border-rose-500');
+      });
+      selectedChipEl = null;
+      SoundFX.pop();
+    }
+
+    // Store initial placeholder text on zones & attach click-to-clear / tap-to-place
+    document.querySelectorAll('.dnd-zone').forEach(zone => {
+      zone.dataset.placeholder = zone.textContent;
+      zone.addEventListener('click', () => {
+        if (selectedChipEl && selectedChipEl.dataset.group === zone.dataset.group) {
+          placeChipInZone(selectedChipEl, zone);
+        } else if (zone.dataset.filledChipId) {
+          // Clicking a filled slot returns its tile to the bank
+          const prevChip = document.getElementById(zone.dataset.filledChipId);
+          if (prevChip) prevChip.classList.remove('opacity-30', 'pointer-events-none');
+          zone.textContent = zone.dataset.placeholder;
+          delete zone.dataset.currentVal;
+          delete zone.dataset.filledChipId;
+          zone.classList.add('border-dashed', 'text-slate-400');
+          zone.classList.remove('border-solid', 'bg-indigo-50', 'bg-emerald-50', 'bg-rose-50', 'text-slate-900', 'border-emerald-500', 'border-rose-500');
+          SoundFX.pop();
+        }
+      });
+    });
+
+    // Attach Universal Pointer Drag + Tap Selection to all chips
+    document.querySelectorAll('.dnd-chip').forEach(chip => {
+      chip.addEventListener('pointerdown', (e) => {
+        if (chip.classList.contains('pointer-events-none')) return;
+        e.preventDefault();
+        const startX = e.clientX;
+        const startY = e.clientY;
+        let moved = false;
+
+        // Create floating ghost
+        const ghost = chip.cloneNode(true);
+        ghost.id = 'drag-ghost';
+        ghost.style.left = `${startX}px`;
+        ghost.style.top = `${startY}px`;
+        document.body.appendChild(ghost);
+
+        activeDrag = { chip, ghost, startX, startY };
+
+        const onMove = (ev) => {
+          if (!activeDrag) return;
+          const dx = ev.clientX - startX;
+          const dy = ev.clientY - startY;
+          if (Math.hypot(dx, dy) > 5) moved = true;
+          ghost.style.left = `${ev.clientX}px`;
+          ghost.style.top = `${ev.clientY}px`;
+
+          // Highlight hovered valid drop zone
+          document.querySelectorAll(`.dnd-zone[data-group="${chip.dataset.group}"]`).forEach(z => {
+            const r = z.getBoundingClientRect();
+            const inside = ev.clientX >= r.left - 8 && ev.clientX <= r.right + 8 && ev.clientY >= r.top - 8 && ev.clientY <= r.bottom + 8;
+            z.classList.toggle('zone-hover', inside);
+          });
+        };
+
+        const onUp = (ev) => {
+          window.removeEventListener('pointermove', onMove);
+          window.removeEventListener('pointerup', onUp);
+          if (ghost && ghost.parentNode) ghost.parentNode.removeChild(ghost);
+          document.querySelectorAll('.dnd-zone').forEach(z => z.classList.remove('zone-hover'));
+
+          if (!moved) {
+            // Treat as Tap-to-Select toggle
+            if (selectedChipEl === chip) {
+              chip.classList.remove('selected-chip');
+              selectedChipEl = null;
+            } else {
+              document.querySelectorAll('.dnd-chip').forEach(c => c.classList.remove('selected-chip'));
+              chip.classList.add('selected-chip');
+              selectedChipEl = chip;
+              SoundFX.pop();
+            }
+          } else {
+            // Check drop target under pointer
+            let droppedZone = null;
+            document.querySelectorAll(`.dnd-zone[data-group="${chip.dataset.group}"]`).forEach(z => {
+              const r = z.getBoundingClientRect();
+              if (ev.clientX >= r.left - 10 && ev.clientX <= r.right + 10 && ev.clientY >= r.top - 10 && ev.clientY <= r.bottom + 10) {
+                droppedZone = z;
+              }
+            });
+            if (droppedZone) {
+              placeChipInZone(chip, droppedZone);
+            }
+          }
+          activeDrag = null;
+        };
+
+        window.addEventListener('pointermove', onMove);
+        window.addEventListener('pointerup', onUp);
+      });
+    });
+
+    /* =========================================================================
+       4. HELPER FOR HIGH-DPI RESPONSIVE CANVASES
+       ========================================================================= */
+    function setupHiDPICanvas(canvas) {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.max(200, Math.floor(rect.width * dpr));
+      canvas.height = Math.max(150, Math.floor(rect.height * dpr));
+      const ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      return { ctx, w: rect.width, h: rect.height };
+    }
+
+    /* =========================================================================
+       5. ACT I SIMULATION & CHECKPOINTS
+       ========================================================================= */
+    let sim1Rxn = 'AB';
+    let sim1Time = 20;
+    let sim1Playing = false;
+    let sim1AnimId = null;
+
+    const SIM1_MODELS = {
+      AB: {
+        label: 'A → B',
+        primaryName: '[A]',
+        k: 0.03,
+        conc(t) {
+          const e = Math.exp(-0.03 * t);
+          return [
+            { name: '[A] (Reactant)', val: 1.0 * e, rate: -0.03 * e, color: '#4f46e5' },
+            { name: '[B] (Product)', val: 1.0 * (1 - e), rate: +0.03 * e, color: '#059669' }
+          ];
+        },
+        overallRate(t) { return 0.03 * Math.exp(-0.03 * t); }
+      },
+      HI: {
+        label: '2HI → H₂ + I₂',
+        primaryName: '[HI]',
+        k: 0.03,
+        conc(t) {
+          const e = Math.exp(-0.03 * t);
+          return [
+            { name: '[HI] (Reactant)', val: 1.0 * e, rate: -0.03 * e, color: '#4f46e5' },
+            { name: '[H₂] & [I₂] (Products)', val: 0.5 * (1 - e), rate: +0.015 * e, color: '#059669' }
+          ];
+        },
+        overallRate(t) { return 0.015 * Math.exp(-0.03 * t); }
+      },
+      NH3: {
+        label: 'N₂ + 3H₂ → 2NH₃',
+        primaryName: '[H₂]',
+        k: 0.03,
+        conc(t) {
+          const xi = 0.30 * (1 - Math.exp(-0.03 * t));
+          const dxi = 0.30 * 0.03 * Math.exp(-0.03 * t);
+          return [
+            { name: '[H₂] (Reactant)', val: 1.0 - 3 * xi, rate: -3 * dxi, color: '#4f46e5' },
+            { name: '[NH₃] (Product)', val: 2 * xi, rate: +2 * dxi, color: '#059669' },
+            { name: '[N₂] (Reactant)', val: 0.40 - xi, rate: -1 * dxi, color: '#d97706' }
+          ];
+        },
+        overallRate(t) { return 0.30 * 0.03 * Math.exp(-0.03 * t); }
+      }
+    };
+
+    function drawAct1Canvas() {
+      const canvas = document.getElementById('canvas-act1');
+      if (!canvas) return;
+      const { ctx, w, h } = setupHiDPICanvas(canvas);
+      ctx.clearRect(0, 0, w, h);
+
+      const pad = { l: 48, r: 20, t: 22, b: 36 };
+      const plotW = w - pad.l - pad.r;
+      const plotH = h - pad.t - pad.b;
+
+      // Grid lines
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 1;
+      for (let i = 0; i <= 5; i++) {
+        const y = pad.t + (plotH * i) / 5;
+        ctx.beginPath();
+        ctx.moveTo(pad.l, y);
+        ctx.lineTo(w - pad.r, y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '600 10px JetBrains Mono';
+        ctx.textAlign = 'right';
+        ctx.fillText((1.0 - i * 0.2).toFixed(1), pad.l - 6, y + 3);
+      }
+
+      // Axes
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, pad.t);
+      ctx.lineTo(pad.l, h - pad.b);
+      ctx.lineTo(w - pad.r, h - pad.b);
+      ctx.stroke();
+
+      ctx.fillStyle = '#334155';
+      ctx.font = '700 11px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('Time (seconds)', pad.l + plotW / 2, h - 8);
+
+      const model = SIM1_MODELS[sim1Rxn];
+      const toX = (t) => pad.l + (t / 100) * plotW;
+      const toY = (c) => pad.t + (1 - c) * plotH;
+
+      // Plot species curves
+      const seriesCount = model.conc(0).length;
+      for (let s = 0; s < seriesCount; s++) {
+        ctx.strokeStyle = model.conc(0)[s].color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let t = 0; t <= 100; t += 1) {
+          const val = model.conc(t)[s].val;
+          const px = toX(t);
+          const py = toY(val);
+          if (t === 0) ctx.moveTo(px, py);
+          else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+      }
+
+      // Draw Tangent Line on Primary Species (s = 0) at sim1Time
+      const curSeries = model.conc(sim1Time);
+      const p0 = curSeries[0];
+      const cx = toX(sim1Time);
+      const cy = toY(p0.val);
+
+      // Tangent segment spanning ±16 seconds
+      const tStart = Math.max(0, sim1Time - 16);
+      const tEnd = Math.min(100, sim1Time + 16);
+      const cStart = p0.val + p0.rate * (tStart - sim1Time);
+      const cEnd = p0.val + p0.rate * (tEnd - sim1Time);
+
+      ctx.strokeStyle = '#e11d48';
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath();
+      ctx.moveTo(toX(tStart), toY(cStart));
+      ctx.lineTo(toX(tEnd), toY(cEnd));
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Vertical time marker
+      ctx.strokeStyle = 'rgba(79, 70, 229, 0.25)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(cx, pad.t);
+      ctx.lineTo(cx, h - pad.b);
+      ctx.stroke();
+
+      // Highlight dot
+      ctx.fillStyle = '#e11d48';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Legend top right
+      let legY = pad.t + 12;
+      curSeries.forEach((sp) => {
+        ctx.fillStyle = sp.color;
+        ctx.fillRect(w - pad.r - 155, legY - 8, 10, 10);
+        ctx.fillStyle = '#1e293b';
+        ctx.font = '600 10px Inter';
+        ctx.textAlign = 'left';
+        ctx.fillText(sp.name, w - pad.r - 140, legY);
+        legY += 16;
+      });
+
+      // Update Telemetry DOM
+      document.getElementById('sim1-time-val').textContent = `${sim1Time.toFixed(1)} s`;
+      document.getElementById('sim1-init-rate').textContent = `${model.overallRate(0).toFixed(4)} M/s`;
+      document.getElementById('sim1-inst-rate').textContent = `${model.overallRate(sim1Time).toFixed(4)} M/s`;
+
+      const speciesHtml = curSeries.map(sp => {
+        const signStr = sp.rate >= 0 ? '+' : '';
+        return `<div class="flex justify-between">
+          <span class="text-slate-600">${sp.name.split(' ')[0]} change:</span>
+          <span class="font-bold" style="color:${sp.color}">${signStr}${sp.rate.toFixed(4)} M/s</span>
+        </div>`;
+      }).join('');
+      document.getElementById('sim1-species-rates').innerHTML = speciesHtml;
+    }
+
+    document.getElementById('sim1-time').addEventListener('input', (e) => {
+      sim1Time = parseFloat(e.target.value);
+      drawAct1Canvas();
+      completeMilestone('act1_sim', 'Act I Speedometer & Tangent explored!');
+    });
+
+    document.querySelectorAll('.sim1-tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sim1-tab').forEach(b => {
+          b.className = 'sim1-tab px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-white text-slate-700 border border-slate-200 hover:border-indigo-300';
+        });
+        btn.className = 'sim1-tab px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-indigo-600 text-white shadow-sm';
+        sim1Rxn = btn.dataset.rxn;
+        drawAct1Canvas();
+        SoundFX.pop();
+      });
+    });
+
+    document.getElementById('sim1-initial').addEventListener('click', () => {
+      sim1Playing = false;
+      document.getElementById('sim1-play').textContent = '▶ Play Reaction';
+      sim1Time = 0;
+      document.getElementById('sim1-time').value = 0;
+      drawAct1Canvas();
+      completeMilestone('act1_sim', 'Initial Rate (t = 0) measured!');
+    });
+
+    document.getElementById('sim1-play').addEventListener('click', () => {
+      sim1Playing = !sim1Playing;
+      document.getElementById('sim1-play').textContent = sim1Playing ? '⏸ Pause' : '▶ Play Reaction';
+      if (sim1Playing) {
+        if (sim1Time >= 99) sim1Time = 0;
+        const step = () => {
+          if (!sim1Playing) return;
+          sim1Time = Math.min(100, sim1Time + 0.4);
+          document.getElementById('sim1-time').value = sim1Time;
+          drawAct1Canvas();
+          if (sim1Time >= 100) {
+            sim1Playing = false;
+            document.getElementById('sim1-play').textContent = '▶ Play Reaction';
+            completeMilestone('act1_sim', 'Act I Speedometer & Tangent explored!');
+          } else {
+            sim1AnimId = requestAnimationFrame(step);
+          }
+        };
+        sim1AnimId = requestAnimationFrame(step);
+      }
+    });
+
+    function verifyAct1Dnd() {
+      const zones = document.querySelectorAll('.dnd-zone[data-group="act1"]');
+      let allFilled = true;
+      let allCorrect = true;
+      zones.forEach(z => {
+        if (!z.dataset.currentVal) allFilled = false;
+        if (z.dataset.currentVal === z.dataset.answer) {
+          z.classList.add('border-emerald-500', 'bg-emerald-50');
+          z.classList.remove('border-rose-500', 'bg-rose-50');
+        } else {
+          allCorrect = false;
+          z.classList.add('border-rose-500', 'bg-rose-50');
+        }
+      });
+
+      const fb = document.getElementById('act1-dnd-feedback');
+      if (!allFilled) {
+        fb.textContent = '⚠️ Fill all 6 slots before verifying!';
+        fb.className = 'text-xs sm:text-sm font-bold text-amber-600';
+        SoundFX.error();
+      } else if (allCorrect) {
+        fb.textContent = '✅ Spot on! Reactants carry (−) signs, Products carry (+) signs, and each is divided by its coefficient.';
+        fb.className = 'text-xs sm:text-sm font-bold text-emerald-600';
+        completeMilestone('act1_dnd', 'Differential Rate Equation mastered!');
+      } else {
+        fb.textContent = '❌ Check the red slots: Reactants decrease (−), Products increase (+), and divide by coefficients (1, 3, 2).';
+        fb.className = 'text-xs sm:text-sm font-bold text-rose-600';
+        SoundFX.error();
+      }
+    }
+
+    function checkAct1Numeric() {
+      const val = parseFloat(document.getElementById('act1-num-input').value);
+      const fb = document.getElementById('act1-num-feedback');
+      if (!isNaN(val) && Math.abs(val - 0.030) <= 0.002) {
+        fb.textContent = '✅ Correct! Rate = (1/3)(0.045) = 0.015, so +d[NH₃]/dt = 2 × 0.015 = 0.030 M s⁻¹.';
+        fb.className = 'text-xs font-bold text-emerald-300';
+        completeMilestone('act1_num', 'Stoichiometric Rate Calculation solved!');
+      } else {
+        fb.textContent = '❌ Hint: Overall Rate = (1/3) × 0.045 = 0.015 M s⁻¹. Multiply by 2 for NH₃!';
+        fb.className = 'text-xs font-bold text-rose-300';
+        SoundFX.error();
+      }
+    }
+
+    /* =========================================================================
+       6. ACT II SIMULATION & DETECTIVE LAB
+       ========================================================================= */
+    let sim2Order = 1;
+    let sim2A0 = 1.00;
+    let sim2K = 0.05;
+    let sim2YAxis = 'lnA';
+
+    function drawAct2Charts() {
+      const hlCanvas = document.getElementById('canvas-act2-hl');
+      const linCanvas = document.getElementById('canvas-act2-lin');
+      if (!hlCanvas || !linCanvas) return;
+
+      // Calculate half-lives & trajectory
+      let hl1, hl2, maxT;
+      if (sim2Order === 0) {
+        hl1 = sim2A0 / (2 * sim2K);
+        hl2 = hl1 * 0.5;
+        maxT = (sim2A0 / sim2K) * 1.08;
+      } else if (sim2Order === 1) {
+        hl1 = Math.LN2 / sim2K;
+        hl2 = hl1;
+        maxT = hl1 * 3.2;
+      } else {
+        hl1 = 1 / (sim2K * sim2A0);
+        hl2 = hl1 * 2;
+        maxT = hl1 * 3.6;
+      }
+
+      const concAt = (t) => {
+        if (sim2Order === 0) return Math.max(0.001, sim2A0 - sim2K * t);
+        if (sim2Order === 1) return sim2A0 * Math.exp(-sim2K * t);
+        return 1 / (1 / sim2A0 + sim2K * t);
+      };
+
+      // 1. LEFT CANVAS: [A] vs Time with Half-Life Brackets
+      const { ctx: c1, w: w1, h: h1 } = setupHiDPICanvas(hlCanvas);
+      c1.clearRect(0, 0, w1, h1);
+      const pad = { l: 42, r: 16, t: 18, b: 34 };
+      const pw = w1 - pad.l - pad.r;
+      const ph = h1 - pad.t - pad.b;
+
+      const toX1 = (t) => pad.l + (t / maxT) * pw;
+      const toY1 = (a) => pad.t + (1 - a / 1.25) * ph;
+
+      // Axes
+      c1.strokeStyle = '#334155';
+      c1.lineWidth = 1.8;
+      c1.beginPath();
+      c1.moveTo(pad.l, pad.t);
+      c1.lineTo(pad.l, h1 - pad.b);
+      c1.lineTo(w1 - pad.r, h1 - pad.b);
+      c1.stroke();
+
+      // Highlight spans for t1/2(I) and t1/2(II)
+      const x0 = toX1(0);
+      const xH1 = toX1(hl1);
+      const xH2 = toX1(hl1 + hl2);
+
+      c1.fillStyle = 'rgba(79, 70, 229, 0.10)';
+      c1.fillRect(x0, pad.t, xH1 - x0, ph);
+      c1.fillStyle = 'rgba(5, 150, 105, 0.12)';
+      c1.fillRect(xH1, pad.t, Math.min(w1 - pad.r, xH2) - xH1, ph);
+
+      // Dashed lines for 0.5[A]0 and 0.25[A]0
+      const yHalf = toY1(0.5 * sim2A0);
+      const yQuarter = toY1(0.25 * sim2A0);
+      c1.setLineDash([4, 4]);
+      c1.strokeStyle = '#4f46e5';
+      c1.beginPath();
+      c1.moveTo(pad.l, yHalf);
+      c1.lineTo(xH1, yHalf);
+      c1.lineTo(xH1, h1 - pad.b);
+      c1.stroke();
+
+      c1.strokeStyle = '#059669';
+      c1.beginPath();
+      c1.moveTo(pad.l, yQuarter);
+      c1.lineTo(xH2, yQuarter);
+      c1.lineTo(xH2, h1 - pad.b);
+      c1.stroke();
+      c1.setLineDash([]);
+
+      // Curve
+      c1.strokeStyle = '#0f172a';
+      c1.lineWidth = 3;
+      c1.beginPath();
+      for (let i = 0; i <= 80; i++) {
+        const t = (maxT * i) / 80;
+        const a = concAt(t);
+        if (sim2Order === 0 && a <= 0.002 && i > 0) {
+          c1.lineTo(toX1(sim2A0 / sim2K), toY1(0));
+          break;
+        }
+        const px = toX1(t);
+        const py = toY1(a);
+        if (i === 0) c1.moveTo(px, py);
+        else c1.lineTo(px, py);
+      }
+      c1.stroke();
+
+      // Labels
+      c1.fillStyle = '#4f46e5';
+      c1.font = '700 10px JetBrains Mono';
+      c1.textAlign = 'center';
+      c1.fillText('t½(I)', (x0 + xH1) / 2, pad.t + 12);
+      c1.fillStyle = '#059669';
+      c1.fillText('t½(II)', (xH1 + Math.min(w1 - pad.r, xH2)) / 2, pad.t + 12);
+
+      // Update DOM readouts
+      document.getElementById('sim2-hl1').textContent = `${hl1.toFixed(1)} s`;
+      document.getElementById('sim2-hl2').textContent = `${hl2.toFixed(1)} s`;
+      const ratioMap = {
+        0: 't½(II) = 0.5 × t½(I) (Shrinks)',
+        1: 't½(II) = t½(I) (Constant!)',
+        2: 't½(II) = 2 × t½(I) (Doubles!)'
+      };
+      document.getElementById('sim2-hl-badge').textContent = ratioMap[sim2Order];
+
+      // 2. RIGHT CANVAS: Linear Graph Diagnostic
+      const { ctx: c2, w: w2, h: h2 } = setupHiDPICanvas(linCanvas);
+      c2.clearRect(0, 0, w2, h2);
+
+      const sampleT = [];
+      const limitT = sim2Order === 0 ? (sim2A0 / sim2K) * 0.92 : maxT * 0.85;
+      for (let i = 0; i <= 8; i++) sampleT.push((limitT * i) / 8);
+
+      const transform = (a) => {
+        if (sim2YAxis === 'A') return a;
+        if (sim2YAxis === 'lnA') return Math.log(a);
+        return 1 / a;
+      };
+
+      const pts = sampleT.map(t => ({ t, y: transform(concAt(t)) }));
+      const minY = Math.min(...pts.map(p => p.y));
+      const maxY = Math.max(...pts.map(p => p.y));
+      const spanY = Math.max(0.001, maxY - minY);
+
+      const toX2 = (t) => pad.l + (t / limitT) * pw;
+      const toY2 = (y) => pad.t + 12 + (1 - (y - minY) / spanY) * (ph - 24);
+
+      c2.strokeStyle = '#334155';
+      c2.lineWidth = 1.8;
+      c2.beginPath();
+      c2.moveTo(pad.l, pad.t);
+      c2.lineTo(pad.l, h2 - pad.b);
+      c2.lineTo(w2 - pad.r, h2 - pad.b);
+      c2.stroke();
+
+      const isLinearMatch =
+        (sim2Order === 0 && sim2YAxis === 'A') ||
+        (sim2Order === 1 && sim2YAxis === 'lnA') ||
+        (sim2Order === 2 && sim2YAxis === 'invA');
+
+      c2.strokeStyle = isLinearMatch ? '#059669' : '#f59e0b';
+      c2.lineWidth = 3;
+      c2.beginPath();
+      pts.forEach((p, idx) => {
+        const px = toX2(p.t);
+        const py = toY2(p.y);
+        if (idx === 0) c2.moveTo(px, py);
+        else c2.lineTo(px, py);
+      });
+      c2.stroke();
+
+      pts.forEach(p => {
+        c2.fillStyle = isLinearMatch ? '#059669' : '#d97706';
+        c2.beginPath();
+        c2.arc(toX2(p.t), toY2(p.y), 4.5, 0, Math.PI * 2);
+        c2.fill();
+      });
+
+      const statusBox = document.getElementById('sim2-linear-status');
+      const axisName = sim2YAxis === 'A' ? '[A]' : sim2YAxis === 'lnA' ? 'ln[A]' : '1/[A]';
+      if (isLinearMatch) {
+        statusBox.className = 'text-xs font-bold px-3 py-2 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200';
+        statusBox.textContent = `✓ STRAIGHT LINE! Plotting ${axisName} vs. t is linear for ${sim2Order === 0 ? 'Zero' : sim2Order === 1 ? 'First' : 'Second'}-Order reactions.`;
+      } else {
+        statusBox.className = 'text-xs font-bold px-3 py-2 rounded-xl bg-amber-50 text-amber-800 border border-amber-200';
+        statusBox.textContent = `↷ CURVED LINE: Plotting ${axisName} vs. t is nonlinear here. Try another Y-axis button above!`;
+      }
+    }
+
+    document.querySelectorAll('.sim2-order-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sim2-order-btn').forEach(b => {
+          b.className = 'sim2-order-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-white text-slate-700 border border-slate-200 hover:border-emerald-400';
+        });
+        btn.className = 'sim2-order-btn px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm';
+        sim2Order = parseInt(btn.dataset.order, 10);
+        const unitLabel = sim2Order === 0 ? 'M s⁻¹' : sim2Order === 1 ? 's⁻¹' : 'M⁻¹ s⁻¹';
+        document.getElementById('sim2-k-val').textContent = `${sim2K.toFixed(3)} ${unitLabel}`;
+        drawAct2Charts();
+        completeMilestone('act2_sim', 'Half-Life & Linear Diagnostic Lab explored!');
+      });
+    });
+
+    document.querySelectorAll('.sim2-yaxis-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sim2-yaxis-btn').forEach(b => {
+          b.className = 'sim2-yaxis-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold bg-slate-100 text-slate-700';
+        });
+        btn.className = 'sim2-yaxis-btn px-2.5 py-1 rounded-lg text-[11px] font-mono font-bold bg-emerald-600 text-white';
+        sim2YAxis = btn.dataset.yaxis;
+        drawAct2Charts();
+        completeMilestone('act2_sim', 'Half-Life & Linear Diagnostic Lab explored!');
+      });
+    });
+
+    document.getElementById('sim2-a0').addEventListener('input', (e) => {
+      sim2A0 = parseFloat(e.target.value);
+      document.getElementById('sim2-a0-val').textContent = `${sim2A0.toFixed(2)} M`;
+      drawAct2Charts();
+    });
+
+    document.getElementById('sim2-k').addEventListener('input', (e) => {
+      sim2K = parseFloat(e.target.value);
+      const unitLabel = sim2Order === 0 ? 'M s⁻¹' : sim2Order === 1 ? 's⁻¹' : 'M⁻¹ s⁻¹';
+      document.getElementById('sim2-k-val').textContent = `${sim2K.toFixed(3)} ${unitLabel}`;
+      drawAct2Charts();
+    });
+
+    // Detective Mini-Lab Logic
+    let detExpCount = 1;
+    function runDetectiveExp() {
+      const mNO = parseInt(document.getElementById('det-no-mult').value, 10);
+      const mO2 = parseInt(document.getElementById('det-o2-mult').value, 10);
+      const cNO = 0.010 * mNO;
+      const cO2 = 0.010 * mO2;
+      const rate = 700 * Math.pow(cNO, 2) * cO2;
+
+      detExpCount++;
+      const tbody = document.getElementById('det-table-body');
+      const tr = document.createElement('tr');
+      tr.className = 'bg-emerald-50/30';
+      tr.innerHTML = `
+        <td class="py-2 px-3 font-bold">${detExpCount}</td>
+        <td class="py-2 px-3">${cNO.toFixed(3)} (${mNO}×)</td>
+        <td class="py-2 px-3">${cO2.toFixed(3)} (${mO2}×)</td>
+        <td class="py-2 px-3 text-emerald-700 font-bold">${(rate * 1e4).toFixed(2)} × 10⁻⁴</td>
+      `;
+      tbody.appendChild(tr);
+      SoundFX.pop();
+    }
+
+    function verifyDetectiveLaw() {
+      const kVal = parseFloat(document.getElementById('det-k-input').value);
+      const mVal = document.getElementById('det-m-input').value;
+      const nVal = document.getElementById('det-n-input').value;
+      const fb = document.getElementById('det-feedback');
+
+      if (mVal === '2' && nVal === '1' && !isNaN(kVal) && Math.abs(kVal - 700) <= 10) {
+        fb.textContent = '✅ Brilliant deduction! Doubling [NO] quadruples rate (m = 2), doubling [O₂] doubles rate (n = 1), and k = 700 M⁻² s⁻¹.';
+        fb.className = 'w-full text-xs font-bold text-emerald-300';
+        completeMilestone('act2_detective', 'Initial Rate Law cracked!');
+      } else {
+        fb.textContent = '❌ Not quite! Run Exp (2× NO, 1× O₂) and Exp (1× NO, 2× O₂) to isolate m and n, then solve k = Rate / ([NO]²[O₂]).';
+        fb.className = 'w-full text-xs font-bold text-amber-300';
+        SoundFX.error();
+      }
+    }
+
+    /* =========================================================================
+       7. ACT III SIMULATION (COLLISION CANNON) & ENERGY PROFILE BUILDER
+       ========================================================================= */
+    let sim3KE = 140;
+    let sim3Angle = 45;
+    let sim3State = 'idle'; // 'idle' | 'approaching' | 'complex' | 'done'
+    let sim3Progress = 0;
+    let sim3Effective = false;
+    let sim3FailReason = '';
+
+    function drawHIMolecule(ctx, x, y, angleRad, flip = false) {
+      ctx.save();
+      ctx.translate(x, y);
+      if (flip) ctx.scale(-1, 1);
+      ctx.rotate(angleRad);
+
+      // Bond
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(0, -14);
+      ctx.lineTo(0, 14);
+      ctx.stroke();
+
+      // Top: Hydrogen (small glowing cyan)
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(0, -16, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#0f172a';
+      ctx.font = '800 10px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('H', 0, -13);
+
+      // Bottom: Iodine (large purple/amber)
+      ctx.fillStyle = '#a855f7';
+      ctx.beginPath();
+      ctx.arc(0, 16, 17, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '800 11px Inter';
+      ctx.fillText('I', 0, 20);
+
+      ctx.restore();
+    }
+
+    function drawAct3Canvas() {
+      const canvas = document.getElementById('canvas-act3');
+      if (!canvas) return;
+      const { ctx, w, h } = setupHiDPICanvas(canvas);
+      ctx.clearRect(0, 0, w, h);
+
+      // Subtle arena grid
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.12)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < w; x += 30) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = 0; y < h; y += 30) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+
+      const midX = w / 2;
+      const midY = h / 2;
+      const rad = (sim3Angle * Math.PI) / 180;
+
+      // Status HUD inside canvas
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '600 11px JetBrains Mono';
+      ctx.textAlign = 'left';
+      ctx.fillText(`KE: ${sim3KE} kJ/mol (Ea = 180)`, 14, 22);
+      ctx.textAlign = 'right';
+      ctx.fillText(`Tilt: ${sim3Angle}°`, w - 14, 22);
+
+      if (sim3State === 'idle') {
+        drawHIMolecule(ctx, midX - 95, midY, rad, false);
+        drawHIMolecule(ctx, midX + 95, midY, rad, true);
+        ctx.fillStyle = '#64748b';
+        ctx.font = '600 11px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('Ready on Launchpad — Click "Launch Collision!"', midX, h - 16);
+      } else if (sim3State === 'approaching') {
+        const dist = 95 * (1 - sim3Progress);
+        drawHIMolecule(ctx, midX - dist - 14, midY, rad, false);
+        drawHIMolecule(ctx, midX + dist + 14, midY, rad, true);
+      } else if (sim3State === 'complex') {
+        // Glowing Activated Complex at center
+        const glow = ctx.createRadialGradient(midX, midY, 5, midX, midY, 55);
+        glow.addColorStop(0, 'rgba(251, 191, 36, 0.9)');
+        glow.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(midX, midY, 55, 0, Math.PI * 2);
+        ctx.fill();
+
+        drawHIMolecule(ctx, midX - 13, midY, 0, false);
+        drawHIMolecule(ctx, midX + 13, midY, 0, true);
+
+        ctx.fillStyle = '#fde047';
+        ctx.font = '800 12px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚡ ACTIVATED COMPLEX (Transition State) ⚡', midX, midY - 46);
+      } else if (sim3State === 'done') {
+        if (sim3Effective) {
+          // Products formed: H2 (top) and I2 (bottom)
+          const sep = 25 + sim3Progress * 65;
+          // H2 molecule flying up-left
+          ctx.save();
+          ctx.translate(midX - sep * 0.5, midY - sep * 0.75);
+          ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 4;
+          ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(10, 0); ctx.stroke();
+          [-10, 10].forEach(dx => {
+            ctx.fillStyle = '#38bdf8'; ctx.beginPath(); ctx.arc(dx, 0, 10, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#0f172a'; ctx.font = '800 10px Inter'; ctx.textAlign = 'center'; ctx.fillText('H', dx, 3);
+          });
+          ctx.fillStyle = '#7dd3fc'; ctx.font = '700 11px Inter'; ctx.fillText('H₂ Product', 0, -18);
+          ctx.restore();
+
+          // I2 molecule flying down-right
+          ctx.save();
+          ctx.translate(midX + sep * 0.5, midY + sep * 0.75);
+          ctx.strokeStyle = '#c084fc'; ctx.lineWidth = 5;
+          ctx.beginPath(); ctx.moveTo(-16, 0); ctx.lineTo(16, 0); ctx.stroke();
+          [-16, 16].forEach(dx => {
+            ctx.fillStyle = '#a855f7'; ctx.beginPath(); ctx.arc(dx, 0, 17, 0, Math.PI * 2); ctx.fill();
+            ctx.fillStyle = '#ffffff'; ctx.font = '800 11px Inter'; ctx.textAlign = 'center'; ctx.fillText('I', dx, 4);
+          });
+          ctx.fillStyle = '#d8b4fe'; ctx.font = '700 11px Inter'; ctx.fillText('I₂ Product', 0, 30);
+          ctx.restore();
+        } else {
+          // Bounced apart unchanged HI molecules
+          const bounceDist = 16 + sim3Progress * 82;
+          const spin = sim3Progress * 1.4;
+          drawHIMolecule(ctx, midX - bounceDist, midY - sim3Progress * 18, rad - spin, false);
+          drawHIMolecule(ctx, midX + bounceDist, midY + sim3Progress * 18, rad + spin, true);
+
+          ctx.fillStyle = '#fb7185';
+          ctx.font = '800 12px Inter';
+          ctx.textAlign = 'center';
+          ctx.fillText('BOUNCED APART — NO REACTION', midX, midY - 45);
+        }
+      }
+    }
+
+    document.getElementById('sim3-ke').addEventListener('input', (e) => {
+      sim3KE = parseInt(e.target.value, 10);
+      sim3State = 'idle';
+      document.getElementById('sim3-ke-val').textContent = `${sim3KE} kJ/mol`;
+      drawAct3Canvas();
+    });
+
+    document.getElementById('sim3-ang').addEventListener('input', (e) => {
+      sim3Angle = parseInt(e.target.value, 10);
+      sim3State = 'idle';
+      const label = sim3Angle <= 20 ? 'Aligned!' : 'Misaligned';
+      document.getElementById('sim3-ang-val').textContent = `${sim3Angle}° (${label})`;
+      drawAct3Canvas();
+    });
+
+    function setCollisionPreset(ke, ang) {
+      sim3KE = ke;
+      sim3Angle = ang;
+      sim3State = 'idle';
+      document.getElementById('sim3-ke').value = ke;
+      document.getElementById('sim3-ang').value = ang;
+      document.getElementById('sim3-ke-val').textContent = `${ke} kJ/mol`;
+      document.getElementById('sim3-ang-val').textContent = `${ang}° (${ang <= 20 ? 'Aligned!' : 'Misaligned'})`;
+      drawAct3Canvas();
+      SoundFX.pop();
+    }
+
+    document.getElementById('sim3-launch').addEventListener('click', () => {
+      sim3State = 'approaching';
+      sim3Progress = 0;
+      const hasEnergy = sim3KE >= 180;
+      const hasAngle = sim3Angle <= 20;
+      sim3Effective = hasEnergy && hasAngle;
+
+      const outBox = document.getElementById('sim3-outcome');
+      outBox.innerHTML = '<span class="font-bold text-amber-700">Launching HI molecules...</span>';
+
+      const stepApproach = () => {
+        sim3Progress += 0.06;
+        drawAct3Canvas();
+        if (sim3Progress < 1) {
+          requestAnimationFrame(stepApproach);
+        } else if (sim3Effective) {
+          sim3State = 'complex';
+          SoundFX.boom();
+          drawAct3Canvas();
+          setTimeout(() => {
+            sim3State = 'done';
+            sim3Progress = 0;
+            outBox.className = 'rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-4 text-xs sm:text-sm text-emerald-900 leading-relaxed';
+            outBox.innerHTML = '<strong>✅ EFFECTIVE COLLISION!</strong> Kinetic Energy (≥ 180 kJ/mol) broke the H–I bonds AND proper parallel orientation allowed new H–H and I–I bonds to form via the Activated Complex.';
+            completeMilestone('act3_sim', 'Effective Molecular Collision achieved!');
+            const stepSeparate = () => {
+              sim3Progress = Math.min(1, sim3Progress + 0.04);
+              drawAct3Canvas();
+              if (sim3Progress < 1) requestAnimationFrame(stepSeparate);
+            };
+            requestAnimationFrame(stepSeparate);
+          }, 550);
+        } else {
+          sim3State = 'done';
+          sim3Progress = 0;
+          SoundFX.error();
+          outBox.className = 'rounded-2xl border-2 border-rose-300 bg-rose-50 p-4 text-xs sm:text-sm text-rose-900 leading-relaxed';
+          if (!hasEnergy && !hasAngle) {
+            outBox.innerHTML = '<strong>❌ INEFFECTIVE COLLISION (Both Failed):</strong> KE is below Eₐ (180 kJ/mol) AND orientation angle is misaligned.';
+          } else if (!hasEnergy) {
+            outBox.innerHTML = '<strong>❌ INEFFECTIVE COLLISION (Insufficient Energy):</strong> Orientation was great, but KE < 180 kJ/mol could not clear the activation energy barrier.';
+          } else {
+            outBox.innerHTML = '<strong>❌ INEFFECTIVE COLLISION (Wrong Orientation):</strong> Molecules had plenty of energy, but struck at an awkward angle so H–H and I–I bonds could not form.';
+          }
+          const stepBounce = () => {
+            sim3Progress = Math.min(1, sim3Progress + 0.045);
+            drawAct3Canvas();
+            if (sim3Progress < 1) requestAnimationFrame(stepBounce);
+          };
+          requestAnimationFrame(stepBounce);
+        }
+      };
+      requestAnimationFrame(stepApproach);
+    });
+
+    // Energy Profile Exo / Endo Mode Switcher
+    function setEnergyProfileMode(mode) {
+      const isExo = mode === 'exo';
+      document.getElementById('ep-group-exo').classList.toggle('hidden', !isExo);
+      document.getElementById('ep-group-endo').classList.toggle('hidden', isExo);
+
+      document.getElementById('ep-mode-exo').className = isExo
+        ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-600 text-white shadow-sm'
+        : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200';
+      document.getElementById('ep-mode-endo').className = !isExo
+        ? 'px-3 py-1.5 rounded-xl text-xs font-bold bg-orange-600 text-white shadow-sm'
+        : 'px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200';
+
+      // Adjust drop zone vertical positions to match Exo vs Endo plateaus
+      const reactSlot = document.getElementById('ep-slot-react');
+      const prodSlot = document.getElementById('ep-slot-prod');
+      const eafwdSlot = document.getElementById('ep-slot-eafwd');
+      const earevSlot = document.getElementById('ep-slot-earev');
+
+      if (isExo) {
+        reactSlot.style.top = '41%';
+        prodSlot.style.top = '78%';
+        eafwdSlot.style.top = '32%';
+        earevSlot.style.top = '34%';
+      } else {
+        reactSlot.style.top = '78%';
+        prodSlot.style.top = '39%';
+        eafwdSlot.style.top = '44%';
+        earevSlot.style.top = '26%';
+      }
+      SoundFX.pop();
+    }
+
+    function verifyAct3Dnd() {
+      const zones = document.querySelectorAll('.dnd-zone[data-group="act3"]');
+      let allFilled = true;
+      let allCorrect = true;
+      zones.forEach(z => {
+        if (!z.dataset.currentVal) allFilled = false;
+        if (z.dataset.currentVal === z.dataset.answer) {
+          z.classList.add('border-emerald-500', 'bg-emerald-50');
+          z.classList.remove('border-rose-500', 'bg-rose-50');
+        } else {
+          allCorrect = false;
+          z.classList.add('border-rose-500', 'bg-rose-50');
+        }
+      });
+
+      const fb = document.getElementById('act3-dnd-feedback');
+      if (!allFilled) {
+        fb.textContent = '⚠️ Place all 6 labels onto the diagram first!';
+        fb.className = 'text-xs sm:text-sm font-bold text-amber-600';
+        SoundFX.error();
+      } else if (allCorrect) {
+        fb.textContent = '✅ Mastered! Notice how Ea(forward) climbs from Reactants to the Activated Complex, while ΔH is the net gap between Reactants and Products.';
+        fb.className = 'text-xs sm:text-sm font-bold text-emerald-600';
+        completeMilestone('act3_dnd', 'Energy Profile Diagram built accurately!');
+      } else {
+        fb.textContent = '❌ Check the red slots: Summit = Activated Complex, Left = Reactants, Right = Products.';
+        fb.className = 'text-xs sm:text-sm font-bold text-rose-600';
+        SoundFX.error();
+      }
+    }
+
+    /* =========================================================================
+       8. ACT IV SIMULATION (PARTICLE CHAMBER + MAXWELL-BOLTZMANN + ARRHENIUS)
+       ========================================================================= */
+    let sim4Conc = 'med'; // 'low' | 'med' | 'high'
+    let sim4Size = 'powder'; // 'lump' | 'powder'
+    let sim4Temp = 300;
+    let sim4Catalyst = false;
+    let sim4Particles = [];
+    let sim4Flashes = [];
+
+    function initSim4Particles() {
+      const countMap = { low: 16, med: 32, high: 52 };
+      const count = countMap[sim4Conc];
+      sim4Particles = [];
+      for (let i = 0; i < count; i++) {
+        sim4Particles.push({
+          x: 20 + Math.random() * 260,
+          y: 20 + Math.random() * 180,
+          vx: (Math.random() - 0.5) * 2,
+          vy: (Math.random() - 0.5) * 2,
+          type: i % 2 === 0 ? 'A' : 'B'
+        });
+      }
+    }
+
+    function updateSim4Readout() {
+      const concMult = { low: 0.5, med: 1.0, high: 1.8 }[sim4Conc];
+      const sizeMult = sim4Size === 'powder' ? 1.5 : 0.6;
+      const eaVal = sim4Catalyst ? 45 : 75;
+      // Boltzmann factor relative to 300K un-catalyzed
+      const fBase = Math.exp(-75000 / (8.314 * 300));
+      const fNow = Math.exp(-(eaVal * 1000) / (8.314 * sim4Temp));
+      const relRate = Math.max(0.2, (concMult * sizeMult * (fNow / fBase))).toFixed(1);
+
+      document.getElementById('sim4-rate-readout').textContent = `${relRate}×`;
+
+      // Maxwell-Boltzmann % shaded approximation
+      const u = (eaVal * 1000) / (8.314 * sim4Temp);
+      const fracPct = Math.min(92, Math.max(1.2, 100 * (1 + u) * Math.exp(-u) * 0.45));
+      document.getElementById('sim4-frac-badge').textContent = `E ≥ Eₐ: ${fracPct.toFixed(1)}%`;
+    }
+
+    function animateSim4Box() {
+      const canvas = document.getElementById('canvas-act4-box');
+      if (!canvas) return;
+      const { ctx, w, h } = setupHiDPICanvas(canvas);
+      ctx.clearRect(0, 0, w, h);
+
+      // Catalyst surface strip at bottom if ON
+      if (sim4Catalyst) {
+        ctx.fillStyle = 'rgba(139, 92, 246, 0.25)';
+        ctx.fillRect(0, h - 18, w, 18);
+        ctx.strokeStyle = '#a78bfa';
+        ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(0, h - 18); ctx.lineTo(w, h - 18); ctx.stroke();
+        ctx.fillStyle = '#ddd6fe';
+        ctx.font = '700 10px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('Catalytic Surface Active (Lower Ea Pathway)', w / 2, h - 5);
+      }
+
+      // If Solid Lump mode, draw central solid block that particles bounce off
+      const lumpRect = { x: w * 0.34, y: h * 0.28, w: w * 0.32, h: h * 0.44 };
+      if (sim4Size === 'lump') {
+        ctx.fillStyle = '#334155';
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(lumpRect.x, lumpRect.y, lumpRect.w, lumpRect.h, 12);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#e2e8f0';
+        ctx.font = '700 11px Inter';
+        ctx.textAlign = 'center';
+        ctx.fillText('Solid Lump', w / 2, h / 2 - 4);
+        ctx.font = '600 9px Inter';
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillText('(Interior hidden)', w / 2, h / 2 + 10);
+      }
+
+      const speedScale = 0.8 + ((sim4Temp - 280) / 170) * 2.5;
+      const flashChance = sim4Catalyst ? 0.35 : 0.14;
+
+      sim4Particles.forEach((p, idx) => {
+        p.x += p.vx * speedScale;
+        p.y += p.vy * speedScale;
+
+        if (p.x < 8) { p.x = 8; p.vx *= -1; }
+        if (p.x > w - 8) { p.x = w - 8; p.vx *= -1; }
+        if (p.y < 8) { p.y = 8; p.vy *= -1; }
+        const maxY = sim4Catalyst ? h - 24 : h - 8;
+        if (p.y > maxY) { p.y = maxY; p.vy *= -1; }
+
+        // Bounce off Solid Lump if active
+        if (sim4Size === 'lump') {
+          if (p.x > lumpRect.x && p.x < lumpRect.x + lumpRect.w && p.y > lumpRect.y && p.y < lumpRect.y + lumpRect.h) {
+            p.vx *= -1;
+            p.vy *= -1;
+            p.x += p.vx * 4;
+            p.y += p.vy * 4;
+            if (Math.random() < flashChance * 0.4) {
+              sim4Flashes.push({ x: p.x, y: p.y, life: 1 });
+            }
+          }
+        }
+
+        // Pairwise effective collision flashes
+        if (sim4Size === 'powder' && idx % 2 === 0 && idx + 1 < sim4Particles.length) {
+          const q = sim4Particles[idx + 1];
+          if (Math.hypot(p.x - q.x, p.y - q.y) < 14 && Math.random() < flashChance) {
+            sim4Flashes.push({ x: (p.x + q.x) / 2, y: (p.y + q.y) / 2, life: 1 });
+          }
+        }
+
+        // Particle color shifts warmer with temperature
+        ctx.fillStyle = p.type === 'A'
+          ? (sim4Temp > 370 ? '#fb7185' : '#38bdf8')
+          : (sim4Temp > 370 ? '#fbbf24' : '#34d399');
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 4.5, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // Render reaction flashes
+      sim4Flashes = sim4Flashes.filter(f => f.life > 0);
+      sim4Flashes.forEach(f => {
+        ctx.fillStyle = `rgba(253, 224, 71, ${f.life})`;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, 11 * (1.2 - f.life * 0.4), 0, Math.PI * 2);
+        ctx.fill();
+        f.life -= 0.08;
+      });
+
+      requestAnimationFrame(animateSim4Box);
+    }
+
+    function drawMaxwellBoltzmannCanvas() {
+      const canvas = document.getElementById('canvas-act4-mb');
+      if (!canvas) return;
+      const { ctx, w, h } = setupHiDPICanvas(canvas);
+      ctx.clearRect(0, 0, w, h);
+
+      const pad = { l: 38, r: 16, t: 18, b: 32 };
+      const pw = w - pad.l - pad.r;
+      const ph = h - pad.t - pad.b;
+
+      // Axes
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, pad.t);
+      ctx.lineTo(pad.l, h - pad.b);
+      ctx.lineTo(w - pad.r, h - pad.b);
+      ctx.stroke();
+
+      ctx.fillStyle = '#475569';
+      ctx.font = '700 10px Inter';
+      ctx.textAlign = 'center';
+      ctx.fillText('Molecular Kinetic Energy (E)', pad.l + pw / 2, h - 8);
+
+      // Ea threshold x position
+      const eaX = pad.l + (sim4Catalyst ? 0.44 : 0.66) * pw;
+
+      // Maxwell-Boltzmann PDF scaled nicely
+      const tempFactor = sim4Temp / 300; // 0.93 to 1.50
+      const mbY = (xNorm) => {
+        // xNorm in [0, 1]
+        const E = xNorm * 6.5;
+        const val = (E / Math.pow(tempFactor, 1.5)) * Math.exp(-E / tempFactor);
+        return val * 2.35; // normalized around [0, 1]
+      };
+
+      // Shaded area for E >= Ea
+      ctx.fillStyle = sim4Catalyst ? 'rgba(139, 92, 246, 0.28)' : 'rgba(225, 29, 72, 0.24)';
+      ctx.beginPath();
+      ctx.moveTo(eaX, h - pad.b);
+      for (let px = eaX; px <= pad.l + pw; px += 2) {
+        const xn = (px - pad.l) / pw;
+        const py = h - pad.b - Math.min(0.95, mbY(xn)) * ph;
+        ctx.lineTo(px, py);
+      }
+      ctx.lineTo(pad.l + pw, h - pad.b);
+      ctx.closePath();
+      ctx.fill();
+
+      // Main Curve
+      ctx.strokeStyle = sim4Temp > 370 ? '#e11d48' : '#2563eb';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let i = 0; i <= 100; i++) {
+        const xn = i / 100;
+        const px = pad.l + xn * pw;
+        const py = h - pad.b - Math.min(0.95, mbY(xn)) * ph;
+        if (i === 0) ctx.moveTo(px, py);
+        else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      // Vertical Ea Line
+      ctx.strokeStyle = sim4Catalyst ? '#7c3aed' : '#be123c';
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([5, 4]);
+      ctx.beginPath();
+      ctx.moveTo(eaX, pad.t);
+      ctx.lineTo(eaX, h - pad.b);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.fillStyle = sim4Catalyst ? '#6d28d9' : '#be123c';
+      ctx.font = '800 10px JetBrains Mono';
+      ctx.textAlign = 'left';
+      ctx.fillText(sim4Catalyst ? 'Ea (Catalyzed)' : 'Ea (Uncatalyzed)', Math.min(w - 105, eaX + 5), pad.t + 14);
+    }
+
+    document.querySelectorAll('.sim4-conc-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sim4-conc-btn').forEach(b => b.className = 'sim4-conc-btn py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700');
+        btn.className = 'sim4-conc-btn py-1.5 rounded-lg text-xs font-bold bg-rose-600 text-white';
+        sim4Conc = btn.dataset.conc;
+        initSim4Particles();
+        updateSim4Readout();
+        completeMilestone('act4_sim', 'Reaction Factors & Maxwell-Boltzmann explored!');
+      });
+    });
+
+    document.querySelectorAll('.sim4-size-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sim4-size-btn').forEach(b => b.className = 'sim4-size-btn py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700');
+        btn.className = 'sim4-size-btn py-1.5 rounded-lg text-xs font-bold bg-rose-600 text-white';
+        sim4Size = btn.dataset.size;
+        document.getElementById('sim4-surface-label').textContent =
+          sim4Size === 'powder' ? 'High Surface Area (Powder)' : 'Low Surface Area (Lump)';
+        updateSim4Readout();
+        completeMilestone('act4_sim', 'Reaction Factors & Maxwell-Boltzmann explored!');
+      });
+    });
+
+    document.getElementById('sim4-temp').addEventListener('input', (e) => {
+      sim4Temp = parseInt(e.target.value, 10);
+      document.getElementById('sim4-temp-val').textContent = `${sim4Temp} K`;
+      updateSim4Readout();
+      drawMaxwellBoltzmannCanvas();
+      completeMilestone('act4_sim', 'Reaction Factors & Maxwell-Boltzmann explored!');
+    });
+
+    document.getElementById('sim4-cat-btn').addEventListener('click', (e) => {
+      sim4Catalyst = !sim4Catalyst;
+      e.target.textContent = sim4Catalyst ? 'Catalyst: ON (Eₐ = 45 kJ)' : 'Catalyst: OFF (Eₐ = 75 kJ)';
+      e.target.className = sim4Catalyst
+        ? 'w-full py-1.5 px-3 rounded-lg text-xs font-extrabold border-2 border-violet-600 bg-violet-600 text-white transition'
+        : 'w-full py-1.5 px-3 rounded-lg text-xs font-extrabold border-2 border-violet-300 bg-violet-50 text-violet-800 hover:bg-violet-100 transition';
+      updateSim4Readout();
+      drawMaxwellBoltzmannCanvas();
+      completeMilestone('act4_sim', 'Reaction Factors & Maxwell-Boltzmann explored!');
+    });
+
+    // Arrhenius Linear Plot
+    let arrEa = 80;
+    function drawArrheniusCanvas() {
+      const canvas = document.getElementById('canvas-act4-arr');
+      if (!canvas) return;
+      const { ctx, w, h } = setupHiDPICanvas(canvas);
+      ctx.clearRect(0, 0, w, h);
+
+      const pad = { l: 42, r: 16, t: 16, b: 28 };
+      const pw = w - pad.l - pad.r;
+      const ph = h - pad.t - pad.b;
+
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1.6;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, pad.t);
+      ctx.lineTo(pad.l, h - pad.b);
+      ctx.lineTo(w - pad.r, h - pad.b);
+      ctx.stroke();
+
+      ctx.fillStyle = '#475569';
+      ctx.font = '700 10px JetBrains Mono';
+      ctx.textAlign = 'center';
+      ctx.fillText('1 / T (K⁻¹)', pad.l + pw / 2, h - 6);
+      ctx.fillText('ln k', 18, pad.t + 10);
+
+      // Line from x = 0 to x = 1 with negative slope proportional to arrEa
+      const slopeNorm = 0.25 + ((arrEa - 40) / 120) * 0.65;
+      const y0 = pad.t + 14;
+      const y1 = y0 + slopeNorm * (ph - 20);
+
+      ctx.strokeStyle = '#7c3aed';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(pad.l, y0);
+      ctx.lineTo(pad.l + pw * 0.9, y1);
+      ctx.stroke();
+
+      ctx.fillStyle = '#6d28d9';
+      ctx.font = '700 11px JetBrains Mono';
+      ctx.textAlign = 'right';
+      ctx.fillText(`Gradient = -Ea/R = ${(-arrEa * 1000 / 8.314).toFixed(0)} K`, w - pad.r - 4, pad.t + 16);
+    }
+
+    document.getElementById('arr-ea-slider').addEventListener('input', (e) => {
+      arrEa = parseInt(e.target.value, 10);
+      document.getElementById('arr-ea-val').textContent = `Eₐ = ${arrEa} kJ/mol`;
+      drawArrheniusCanvas();
+    });
+
+    function checkArrheniusProblem() {
+      const val = parseFloat(document.getElementById('arr-calc-input').value);
+      const fb = document.getElementById('arr-calc-feedback');
+      if (!isNaN(val) && Math.abs(val - 53.7) <= 0.6) {
+        fb.textContent = '✅ Exact! Ea = 53.7 kJ mol⁻¹ — which explains why keeping milk in a 4°C fridge dramatically slows bacterial spoilage.';
+        fb.className = 'text-xs font-bold text-emerald-300';
+        completeMilestone('act4_arrhenius', 'Arrhenius Activation Energy solved!');
+      } else {
+        fb.textContent = '❌ Not quite! Remember to convert 27°C → 300.15 K and 37°C → 310.15 K, and divide J by 1000 for kJ.';
+        fb.className = 'text-xs font-bold text-rose-300';
+        SoundFX.error();
+      }
+    }
+
+    /* =========================================================================
+       9. EPILOGUE BLUEPRINT & 5-QUESTION BOSS MASTERY QUIZ
+       ========================================================================= */
+    function verifyEpilogueDnd() {
+      const zones = document.querySelectorAll('.dnd-zone[data-group="epi"]');
+      let allFilled = true;
+      let allCorrect = true;
+      zones.forEach(z => {
+        if (!z.dataset.currentVal) allFilled = false;
+        if (z.dataset.currentVal === z.dataset.answer) {
+          z.classList.add('border-emerald-500', 'bg-emerald-50');
+          z.classList.remove('border-rose-500', 'bg-rose-50');
+        } else {
+          allCorrect = false;
+          z.classList.add('border-rose-500', 'bg-rose-50');
+        }
+      });
+
+      const fb = document.getElementById('epi-dnd-feedback');
+      if (!allFilled) {
+        fb.textContent = '⚠️ Match all 4 Story Acts with their analogies first!';
+        fb.className = 'text-xs sm:text-sm font-bold text-amber-600';
+        SoundFX.error();
+      } else if (allCorrect) {
+        fb.textContent = '✅ Complete Story Blueprint verified! You have connected every concept to its real-world intuition.';
+        fb.className = 'text-xs sm:text-sm font-bold text-emerald-600';
+        completeMilestone('epilogue_dnd', '4-Act Story Blueprint matched!');
+      } else {
+        fb.textContent = '❌ Some analogies are swapped—check the red cards and try again!';
+        fb.className = 'text-xs sm:text-sm font-bold text-rose-600';
+        SoundFX.error();
+      }
+    }
+
+    const BOSS_QUESTIONS = [
+      {
+        act: 'Act I • Differential Rate',
+        q: 'In the decomposition 2N₂O₅(g) → 4NO₂(g) + O₂(g), oxygen gas is formed at 0.024 M s⁻¹. What is the rate of formation of NO₂(g)?',
+        options: ['0.006 M s⁻¹', '0.024 M s⁻¹', '0.048 M s⁻¹', '0.096 M s⁻¹'],
+        correct: 3,
+        explanation: 'Rate = +(1/4)d[NO₂]/dt = +d[O₂]/dt = 0.024 M s⁻¹. Therefore, +d[NO₂]/dt = 4 × 0.024 = 0.096 M s⁻¹.'
+      },
+      {
+        act: 'Act II • Half-Life & Orders',
+        q: 'A reactant decays from 0.80 M to 0.40 M in 25 minutes, and from 0.40 M to 0.20 M in the next 50 minutes. What is the reaction order?',
+        options: ['Zero-order', 'First-order', 'Second-order', 'Third-order'],
+        correct: 2,
+        explanation: 'The second half-life (50 min) is double the first half-life (25 min): t½(II) = 2·t½(I), which is the signature of a Second-Order reaction (t½ = 1 / k[A]₀).'
+      },
+      {
+        act: 'Act III • Collision Theory',
+        q: 'Why do most molecular collisions at room temperature fail to produce a chemical reaction?',
+        options: [
+          'Molecules repel each other electrically at all speeds',
+          'Collisions lack kinetic energy ≥ Ea or occur in an improper orientation',
+          'Products always have higher potential energy than reactants',
+          'The rate constant k equals zero at room temperature'
+        ],
+        correct: 1,
+        explanation: 'Collision Theory requires BOTH total kinetic energy ≥ Activation Energy (Ea) AND proper geometric orientation to form the activated complex.'
+      },
+      {
+        act: 'Act III & IV • Catalysis',
+        q: 'Adding a suitable catalyst to an exothermic reaction alters which of the following?',
+        options: [
+          'Lowers both Ea(forward) and Ea(reverse) while keeping ΔH unchanged',
+          'Makes ΔH more negative so more heat is released',
+          'Increases the average kinetic energy of reactant molecules',
+          'Increases the equilibrium yield of products'
+        ],
+        correct: 0,
+        explanation: 'Like drilling a tunnel through a mountain pass, a catalyst provides an alternative pathway with a lower transition-state summit, lowering both Ea(fwd) and Ea(rev) equally without changing ΔH.'
+      },
+      {
+        act: 'Act IV • Arrhenius Equation',
+        q: 'When plotting ln k on the y-axis against 1/T (in K⁻¹) on the x-axis, a straight line with gradient −12,000 K is obtained. What is the activation energy Ea? (R = 8.314 J mol⁻¹ K⁻¹)',
+        options: ['1.44 kJ mol⁻¹', '12.0 kJ mol⁻¹', '99.8 kJ mol⁻¹', '1443 kJ mol⁻¹'],
+        correct: 2,
+        explanation: 'Gradient = -Ea / R ⇒ -12,000 = -Ea / 8.314 ⇒ Ea = 12,000 × 8.314 = 99,768 J mol⁻¹ ≈ 99.8 kJ mol⁻¹.'
+      }
+    ];
+
+    const quizAnswers = {};
+
+    function renderBossQuiz() {
+      const container = document.getElementById('quiz-container');
+      container.innerHTML = BOSS_QUESTIONS.map((item, qIdx) => `
+        <div class="rounded-2xl border border-slate-200 bg-slate-50/60 p-5 space-y-3" id="quiz-card-${qIdx}">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-indigo-600">Question ${qIdx + 1} • ${item.act}</span>
+            <span id="q-status-${qIdx}" class="text-xs font-bold text-slate-400">Unanswered</span>
+          </div>
+          <p class="text-sm sm:text-base font-bold text-slate-900">${item.q}</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            ${item.options.map((opt, oIdx) => `
+              <button type="button" onclick="answerQuiz(${qIdx}, ${oIdx})"
+                id="q-${qIdx}-opt-${oIdx}"
+                class="text-left px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:border-indigo-400 text-xs sm:text-sm font-medium text-slate-800 transition">
+                <span class="font-mono font-bold text-indigo-600 mr-1.5">${String.fromCharCode(65 + oIdx)}.</span> ${opt}
+              </button>
+            `).join('')}
+          </div>
+          <div id="q-exp-${qIdx}" class="hidden rounded-xl p-3 text-xs leading-relaxed"></div>
+        </div>
+      `).join('');
+    }
+
+    function answerQuiz(qIdx, oIdx) {
+      const item = BOSS_QUESTIONS[qIdx];
+      quizAnswers[qIdx] = oIdx;
+      const isCorrect = oIdx === item.correct;
+
+      // Style buttons
+      item.options.forEach((_, idx) => {
+        const btn = document.getElementById(`q-${qIdx}-opt-${idx}`);
+        btn.className = 'text-left px-4 py-2.5 rounded-xl border text-xs sm:text-sm font-medium transition ';
+        if (idx === item.correct) {
+          btn.className += 'border-emerald-500 bg-emerald-50 text-emerald-900 font-bold';
+        } else if (idx === oIdx && !isCorrect) {
+          btn.className += 'border-rose-500 bg-rose-50 text-rose-900';
+        } else {
+          btn.className += 'border-slate-200 bg-white text-slate-500';
+        }
+      });
+
+      const statusEl = document.getElementById(`q-status-${qIdx}`);
+      statusEl.textContent = isCorrect ? '✓ Correct' : '✕ Review Solution';
+      statusEl.className = isCorrect ? 'text-xs font-extrabold text-emerald-600' : 'text-xs font-extrabold text-rose-600';
+
+      const expEl = document.getElementById(`q-exp-${qIdx}`);
+      expEl.classList.remove('hidden');
+      expEl.className = isCorrect
+        ? 'rounded-xl p-3 text-xs leading-relaxed bg-emerald-50 text-emerald-900 border border-emerald-200'
+        : 'rounded-xl p-3 text-xs leading-relaxed bg-amber-50 text-amber-900 border border-amber-200';
+      expEl.innerHTML = `<strong>Worked Solution:</strong> ${item.explanation}`;
+
+      if (isCorrect) SoundFX.pop();
+      else SoundFX.error();
+
+      const answeredCount = Object.keys(quizAnswers).length;
+      const correctCount = Object.entries(quizAnswers).filter(([qi, oi]) => BOSS_QUESTIONS[qi].correct === oi).length;
+      document.getElementById('badge-epilogue_quiz').textContent = `${correctCount} / ${BOSS_QUESTIONS.length} Correct`;
+
+      if (answeredCount === BOSS_QUESTIONS.length) {
+        completeMilestone('epilogue_quiz', `Boss Quiz Completed (${correctCount}/5)!`);
+        const cert = document.getElementById('certificate-banner');
+        cert.classList.remove('hidden');
+        document.getElementById('cert-summary').textContent =
+          `You scored ${correctCount} out of ${BOSS_QUESTIONS.length} on the Boss Mastery Check and completed ${completedSet.size} of ${MILESTONES.length} interactive studio milestones!`;
+      }
+    }
+
+    function checkCertificateUnlock() {
+      if (completedSet.size === MILESTONES.length) {
+        const cert = document.getElementById('certificate-banner');
+        cert.classList.remove('hidden');
+      }
+    }
+
+    /* =========================================================================
+       10. INITIALIZATION & WINDOW RESIZE HANDLERS
+       ========================================================================= */
+    function redrawAllCanvases() {
+      drawAct1Canvas();
+      drawAct2Charts();
+      drawAct3Canvas();
+      drawMaxwellBoltzmannCanvas();
+      drawArrheniusCanvas();
+    }
+
+    window.addEventListener('load', () => {
+      initSim4Particles();
+      updateSim4Readout();
+      renderBossQuiz();
+      redrawAllCanvases();
+      animateSim4Box();
+    });
+
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(redrawAllCanvases, 100);
+    });
+  </script>
+</body>
+</html>
